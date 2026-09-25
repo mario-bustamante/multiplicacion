@@ -1,4 +1,4 @@
-package com.mbmath.multiplicacion
+package com.mbmath.multiplication
 
 import org.junit.Test
 

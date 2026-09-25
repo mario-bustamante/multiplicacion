@@ -1,12 +1,15 @@
-package com.multiplicacion.app.ui
+package com.mbmath.multiplication.ui
 
 import android.graphics.BitmapFactory
+import androidx.cardview.R
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,8 +24,10 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,25 +35,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.resolveDefaults
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.multiplicacion.app.game.EstadoJuego
-import com.multiplicacion.app.game.JuegoViewModel
-import com.multiplicacion.app.game.PantallaJuego
-import com.multiplicacion.app.model.ConfiguracionJuego
-import com.multiplicacion.app.model.Dificultad
-import com.multiplicacion.app.model.ModoJuego
-import com.multiplicacion.app.model.Pregunta
+import com.mbmath.multiplication.game.GameState
+import com.mbmath.multiplication.game.GameViewModel
+import com.mbmath.multiplication.game.PantallaJuego
+import com.mbmath.multiplication.model.Dificultad
+import com.mbmath.multiplication.model.GameConfiguration
+import com.mbmath.multiplication.model.ModoJuego
+import com.mbmath.multiplication.model.Question
 
-private val Fondo = androidx.compose.ui.graphics.Color(0xFFA0A0F6)
 
 @Composable
-fun MultiplicacionApp(viewModel: JuegoViewModel) {
+fun MultiplicationApp(viewModel: GameViewModel) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
-    Surface(modifier = Modifier.fillMaxSize(), color = Fondo) {
+    Surface(modifier = Modifier.fillMaxSize(), color = colorResource(R.color.cardview_light_background)) {
         when (val pantalla = estado.pantalla) {
             PantallaJuego.Inicio -> InicioScreen(
                 onJugar = viewModel::mostrarAyuda,
@@ -63,10 +71,10 @@ fun MultiplicacionApp(viewModel: JuegoViewModel) {
                 estado = estado,
                 onResponder = viewModel::responder,
                 onResultados = viewModel::mostrarResultados,
-                onInicio = viewModel::volverInicio
+                onInicio = viewModel::volverInicio,
             )
             PantallaJuego.Resultados -> ResultadosScreen(
-                preguntas = estado.preguntas,
+                questions = estado.questions,
                 onVolver = viewModel::volverAlJuego
             )
             PantallaJuego.Felicitacion -> FelicitacionScreen(
@@ -80,7 +88,7 @@ fun MultiplicacionApp(viewModel: JuegoViewModel) {
 
 @Composable
 private fun InicioScreen(
-    onJugar: (ConfiguracionJuego) -> Unit,
+    onJugar: (GameConfiguration) -> Unit,
     onCreditos: () -> Unit
 ) {
     var jugador by remember { mutableStateOf("") }
@@ -101,7 +109,7 @@ private fun InicioScreen(
         Selector("Dificultad", Dificultad.entries, dificultad, { dificultad = it }) { it.titulo }
         Spacer(Modifier.height(12.dp))
         Button(
-            onClick = { onJugar(ConfiguracionJuego(jugador.trim(), modo, dificultad)) },
+            onClick = { onJugar(GameConfiguration(jugador.trim(), modo, dificultad)) },
             enabled = jugador.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) { Text("Jugar") }
@@ -131,7 +139,7 @@ private fun <T> Selector(
 
 @Composable
 private fun AyudaScreen(
-    configuracion: ConfiguracionJuego,
+    configuracion: GameConfiguration,
     onComenzar: () -> Unit,
     onInicio: () -> Unit
 ) {
@@ -152,12 +160,13 @@ private fun AyudaScreen(
 
 @Composable
 private fun JuegoScreen(
-    estado: EstadoJuego,
+    estado: GameState,
     onResponder: (Int) -> Unit,
     onResultados: () -> Unit,
-    onInicio: () -> Unit
+    onInicio: () -> Unit,
+    paddingValues: PaddingValues? = null
 ) {
-    val pregunta = estado.preguntaActual ?: return
+    val pregunta = estado.questionActual ?: return
     val configuracion = estado.configuracion ?: return
     AppColumn {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -178,28 +187,41 @@ private fun JuegoScreen(
             Text("${pregunta.valor1[pregunta.correcto]} × ${pregunta.valor2[pregunta.correcto]}", style = MaterialTheme.typography.displaySmall)
         }
         Spacer(Modifier.height(12.dp))
-        pregunta.valor1.indices.forEach { opcion ->
-            val texto = if (configuracion.modo == ModoJuego.BUSCAR_MULTIPLICACION) {
-                "${pregunta.valor1[opcion]} × ${pregunta.valor2[opcion]}"
-            } else {
-                pregunta.resultado[opcion].toString()
-            }
-            Button(
-                onClick = { onResponder(opcion) },
-                enabled = opcion !in estado.opcionesDeshabilitadas && estado.opcionSeleccionada == null,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+
+
+        AssetImage(
+            path = "images/${pregunta.valor2[pregunta.correcto]}x${pregunta.valor1[pregunta.correcto]}" +
+                if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "a.gif" else "b.gif",
+            modifier = Modifier.width(80.dp),//.size(width = 56.dp, height = 76.dp),
+            maintainAspectRatio = true
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            pregunta.valor1.indices.forEach { opcion ->
+                val texto = if (configuracion.modo == ModoJuego.BUSCAR_MULTIPLICACION) {
+                    "${pregunta.valor1[opcion]} × ${pregunta.valor2[opcion]}"
+                } else {
+                    pregunta.resultado[opcion].toString()
+                }
+                TextButton(
+                    onClick = { onResponder(opcion) },
+                    enabled = opcion !in estado.opcionesDeshabilitadas && estado.opcionSeleccionada == null,
+                    shape = RectangleShape,
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                ) {
                     AssetImage(
                         path = "images/${pregunta.valor2[opcion]}x${pregunta.valor1[opcion]}" +
-                            if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "b.gif" else "a.gif",
-                        modifier = Modifier.size(width = 56.dp, height = 76.dp)
+                                if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "b.gif" else "a.gif",
+                            modifier = Modifier.fillMaxWidth(),
+                            maintainAspectRatio = true
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text(texto)
                 }
             }
         }
+        
         Spacer(Modifier.height(8.dp))
         OutlinedButton(onClick = onResultados, modifier = Modifier.fillMaxWidth()) { Text("Resultados") }
         OutlinedButton(onClick = onInicio, modifier = Modifier.fillMaxWidth()) { Text("Inicio") }
@@ -207,11 +229,11 @@ private fun JuegoScreen(
 }
 
 @Composable
-private fun ResultadosScreen(preguntas: List<Pregunta>, onVolver: () -> Unit) {
+private fun ResultadosScreen(questions: List<Question>, onVolver: () -> Unit) {
     AppColumn {
         Text("Resultados", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         LazyColumn(modifier = Modifier.weight(1f)) {
-            itemsIndexed(preguntas) { indice, pregunta ->
+            itemsIndexed(questions) { indice, pregunta ->
                 val correcta = pregunta.respuesta == pregunta.correcto + 1
                 val estado = when {
                     pregunta.respuesta == 0 -> "Sin respuesta"
@@ -231,7 +253,7 @@ private fun ResultadosScreen(preguntas: List<Pregunta>, onVolver: () -> Unit) {
 }
 
 @Composable
-private fun FelicitacionScreen(estado: EstadoJuego, onInicio: () -> Unit) {
+private fun FelicitacionScreen(estado: GameState, onInicio: () -> Unit) {
     AppColumn {
         Text("¡¡Felicitaciones ${estado.configuracion?.jugador.orEmpty()}!!", style = MaterialTheme.typography.headlineMedium)
         AssetImage("images/personaje.png", Modifier.size(150.dp))
@@ -253,9 +275,11 @@ private fun CreditosScreen(onInicio: () -> Unit) {
 }
 
 @Composable
-private fun AppColumn(content: @Composable () -> Unit) {
+private fun AppColumn(content: @Composable ColumnScope.() -> Unit) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(20.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
         content = content
@@ -263,14 +287,54 @@ private fun AppColumn(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun AssetImage(path: String, modifier: Modifier = Modifier) {
+private fun AssetImage(
+    path: String,
+    modifier: Modifier = Modifier,
+    maintainAspectRatio: Boolean = false
+) {
     val context = LocalContext.current
     val bitmap = remember(path) {
         runCatching { context.assets.open(path).use(BitmapFactory::decodeStream) }.getOrNull()
     }
     if (bitmap != null) {
-        Image(bitmap = bitmap.asImageBitmap(), contentDescription = null, modifier = modifier)
+        val imageModifier = if (maintainAspectRatio) {
+            modifier.aspectRatio(bitmap.width.toFloat() / bitmap.height)
+        } else {
+            modifier
+        }
+        Image(bitmap = bitmap.asImageBitmap(), contentDescription = null, modifier = imageModifier)
     } else {
         Card(modifier = modifier) {}
+    }
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun DefaultPreview() {
+    Surface(modifier = Modifier.fillMaxSize(), color = colorResource(R.color.cardview_light_background)) {
+    //Scaffold() { paddingValues ->
+        JuegoScreen(
+            estado = GameState(
+                pantalla = PantallaJuego.Pregunta,
+                configuracion = GameConfiguration(
+                    jugador = "Ana",
+                    modo = ModoJuego.BUSCAR_RESULTADO,
+                    dificultad = Dificultad.FACIL
+                ),
+                questions = listOf(
+                    Question(
+                        valor1 = intArrayOf(2, 4, 5),
+                        valor2 = intArrayOf(3, 2, 2),
+                        resultado = intArrayOf(6, 8, 10),
+                        correcto = 0
+                    )
+                )
+            ),
+            onResponder = {},
+            onResultados = {},
+            onInicio = {},
+         //   paddingValues
+        )
     }
 }

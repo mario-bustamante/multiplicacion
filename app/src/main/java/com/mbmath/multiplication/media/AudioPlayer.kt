@@ -1,4 +1,4 @@
-package com.multiplicacion.app.media
+package com.mbmath.multiplication.media
 
 import android.content.Context
 import android.media.MediaPlayer

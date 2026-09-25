@@ -1,4 +1,4 @@
-package com.mbmath.multiplicacion
+package com.mbmath.multiplication
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.multiplicacion.app.model
+package com.mbmath.multiplication.model
 
 enum class ModoJuego(val titulo: String) {
     BUSCAR_RESULTADO("Buscar Resultado"),
@@ -12,7 +12,7 @@ enum class Dificultad(val titulo: String) {
     AVANZADO("Avanzado")
 }
 
-data class ConfiguracionJuego(
+data class GameConfiguration(
     val jugador: String,
     val modo: ModoJuego,
     val dificultad: Dificultad

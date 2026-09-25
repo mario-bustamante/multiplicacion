@@ -1,11 +1,10 @@
-package com.multiplicacion.app.game
+package com.mbmath.multiplication.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.multiplicacion.app.model.ConfiguracionJuego
-import com.multiplicacion.app.model.Dificultad
-import com.multiplicacion.app.model.ModoJuego
-import com.multiplicacion.app.model.Pregunta
+import com.mbmath.multiplication.model.GameConfiguration
+import com.mbmath.multiplication.model.ModoJuego
+import com.mbmath.multiplication.model.Question
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,9 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class JuegoViewModel : ViewModel() {
-    private val _estado = MutableStateFlow(EstadoJuego())
-    val estado: StateFlow<EstadoJuego> = _estado.asStateFlow()
+class GameViewModel : ViewModel() {
+    private val _estado = MutableStateFlow(GameState())
+    val estado: StateFlow<GameState> = _estado.asStateFlow()
 
     private var modoActual = ModoJuego.BUSCAR_RESULTADO
 
@@ -24,10 +23,10 @@ class JuegoViewModel : ViewModel() {
     }
 
     fun volverInicio() {
-        _estado.value = EstadoJuego()
+        _estado.value = GameState()
     }
 
-    fun mostrarAyuda(configuracion: ConfiguracionJuego) {
+    fun mostrarAyuda(configuracion: GameConfiguration) {
         modoActual = configuracion.modo
         _estado.value = _estado.value.copy(
             pantalla = PantallaJuego.Ayuda(configuracion),
@@ -41,7 +40,7 @@ class JuegoViewModel : ViewModel() {
         val pregunta = crearPregunta(1)
         _estado.value = _estado.value.copy(
             pantalla = PantallaJuego.Pregunta,
-            preguntas = listOf(pregunta),
+            questions = listOf(pregunta),
             indice = 0,
             etapa = 1,
             contadorEtapa = 1,
@@ -53,16 +52,16 @@ class JuegoViewModel : ViewModel() {
 
     fun responder(opcion: Int) {
         val actual = _estado.value
-        val pregunta = actual.preguntaActual ?: return
+        val pregunta = actual.questionActual ?: return
         if (opcion in actual.opcionesDeshabilitadas || actual.opcionSeleccionada != null) return
 
         val correcta = opcion == pregunta.correcto
-        val preguntas = actual.preguntas.toMutableList()
+        val preguntas = actual.questions.toMutableList()
         preguntas[actual.indice] = pregunta.responder(opcion)
 
         if (!correcta) {
             _estado.value = actual.copy(
-                preguntas = preguntas,
+                questions = preguntas,
                 mensaje = "Incorrecto",
                 opcionesDeshabilitadas = actual.opcionesDeshabilitadas + opcion
             )
@@ -71,7 +70,7 @@ class JuegoViewModel : ViewModel() {
 
         val resultado = pregunta.resultado[pregunta.correcto]
         _estado.value = actual.copy(
-            preguntas = preguntas,
+            questions = preguntas,
             mensaje = "Correcto   ${pregunta.valor1[pregunta.correcto]} x ${pregunta.valor2[pregunta.correcto]} = $resultado",
             opcionSeleccionada = opcion
         )
@@ -104,7 +103,7 @@ class JuegoViewModel : ViewModel() {
         val siguienteEtapa = if (actual.contadorEtapa == 3) actual.etapa + 1 else actual.etapa
         val siguiente = crearPregunta(siguienteEtapa)
         _estado.value = actual.copy(
-            preguntas = actual.preguntas + siguiente,
+            questions = actual.questions + siguiente,
             indice = actual.indice + 1,
             etapa = siguienteEtapa,
             contadorEtapa = siguienteContador,
@@ -114,14 +113,14 @@ class JuegoViewModel : ViewModel() {
         )
     }
 
-    private fun crearPregunta(etapa: Int): Pregunta {
+    private fun crearPregunta(etapa: Int): Question {
         val valores = mutableListOf<Pair<Int, Int>>()
         while (valores.size < 3) {
             val valor = valoresDeEtapa(etapa)
             if (valor !in valores) valores += valor
         }
         val resultados = valores.map { (valor1, valor2) -> valor1 * valor2 }.toIntArray()
-        return Pregunta(
+        return Question(
             valor1 = valores.map { it.first }.toIntArray(),
             valor2 = valores.map { it.second }.toIntArray(),
             resultado = resultados,
