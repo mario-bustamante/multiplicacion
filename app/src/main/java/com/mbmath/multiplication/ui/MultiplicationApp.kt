@@ -1,18 +1,23 @@
 package com.mbmath.multiplication.ui
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
+import android.content.res.Configuration
 import androidx.cardview.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,14 +25,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,14 +46,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.resolveDefaults
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.game.GameViewModel
@@ -51,27 +65,58 @@ import com.mbmath.multiplication.model.Dificultad
 import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.ModoJuego
 import com.mbmath.multiplication.model.Question
+import com.mbmath.multiplication.ui.components.AssetImage
+import com.mbmath.multiplication.ui.screens.HomeScreen
+import com.mbmath.multiplication.ui.screens.PlayScreen
 
-
+@SuppressLint("SuspiciousIndentation")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiplicationApp(viewModel: GameViewModel) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
-    Surface(modifier = Modifier.fillMaxSize(), color = colorResource(R.color.cardview_light_background)) {
+
+        Scaffold(
+            topBar = {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text("Multiplicación",
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 19.sp
+                        )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFF1565C0),
+                        scrolledContainerColor = Color.Unspecified,
+                        navigationIconContentColor = Color.Unspecified,
+                        titleContentColor = Color.White,
+                        actionIconContentColor = Color.Unspecified
+                    ),
+                )
+            }
+
+        ) { paddingValues ->
+
+
+
+
         when (val pantalla = estado.pantalla) {
-            PantallaJuego.Inicio -> InicioScreen(
+            PantallaJuego.Inicio -> HomeScreen(
                 onJugar = viewModel::mostrarAyuda,
-                onCreditos = viewModel::mostrarCreditos
+                onCreditos = viewModel::mostrarCreditos,
+                paddingValues
             )
             is PantallaJuego.Ayuda -> AyudaScreen(
                 configuracion = pantalla.configuracion,
                 onComenzar = viewModel::comenzar,
                 onInicio = viewModel::volverInicio
             )
-            PantallaJuego.Pregunta -> JuegoScreen(
+            PantallaJuego.Pregunta -> PlayScreen(
                 estado = estado,
                 onResponder = viewModel::responder,
                 onResultados = viewModel::mostrarResultados,
                 onInicio = viewModel::volverInicio,
+                paddingValues
             )
             PantallaJuego.Resultados -> ResultadosScreen(
                 questions = estado.questions,
@@ -86,56 +131,8 @@ fun MultiplicationApp(viewModel: GameViewModel) {
     }
 }
 
-@Composable
-private fun InicioScreen(
-    onJugar: (GameConfiguration) -> Unit,
-    onCreditos: () -> Unit
-) {
-    var jugador by remember { mutableStateOf("") }
-    var modo by remember { mutableStateOf(ModoJuego.BUSCAR_RESULTADO) }
-    var dificultad by remember { mutableStateOf(Dificultad.FACIL) }
 
-    AppColumn {
-        Text("Multiplicación", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(20.dp))
-        OutlinedTextField(
-            value = jugador,
-            onValueChange = { jugador = it },
-            label = { Text("Nombre del jugador") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Selector("Tipo de juego", ModoJuego.entries, modo, { modo = it }) { it.titulo }
-        Selector("Dificultad", Dificultad.entries, dificultad, { dificultad = it }) { it.titulo }
-        Spacer(Modifier.height(12.dp))
-        Button(
-            onClick = { onJugar(GameConfiguration(jugador.trim(), modo, dificultad)) },
-            enabled = jugador.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Jugar") }
-        OutlinedButton(onClick = onCreditos, modifier = Modifier.fillMaxWidth()) { Text("Créditos") }
-    }
-}
 
-@Composable
-private fun <T> Selector(
-    etiqueta: String,
-    opciones: List<T>,
-    seleccion: T,
-    onSeleccion: (T) -> Unit,
-    texto: (T) -> String
-) {
-    Column(modifier = Modifier.padding(top = 12.dp)) {
-        Text(etiqueta, fontWeight = FontWeight.Bold)
-        Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-            opciones.forEach { opcion ->
-                OutlinedButton(onClick = { onSeleccion(opcion) }) {
-                    Text(if (opcion == seleccion) "✓ ${texto(opcion)}" else texto(opcion))
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun AyudaScreen(
@@ -158,75 +155,6 @@ private fun AyudaScreen(
     }
 }
 
-@Composable
-private fun JuegoScreen(
-    estado: GameState,
-    onResponder: (Int) -> Unit,
-    onResultados: () -> Unit,
-    onInicio: () -> Unit,
-    paddingValues: PaddingValues? = null
-) {
-    val pregunta = estado.questionActual ?: return
-    val configuracion = estado.configuracion ?: return
-    AppColumn {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            Text("Pregunta ${estado.indice + 1} de 24", fontWeight = FontWeight.Bold)
-            Spacer(Modifier.weight(1f))
-            Text("Etapa ${estado.etapa}")
-        }
-        LinearProgressIndicator(progress = { estado.progreso }, modifier = Modifier.fillMaxWidth())
-        Spacer(Modifier.height(12.dp))
-        Text(configuracion.modo.titulo, style = MaterialTheme.typography.titleLarge)
-        Text(estado.mensaje, color = if (estado.mensaje.startsWith("Incorrecto")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary)
-        Spacer(Modifier.height(12.dp))
-        if (configuracion.modo != ModoJuego.BUSCAR_RESULTADO) {
-            Text("Encuentra la multiplicación de:", fontWeight = FontWeight.Bold)
-            Text("${pregunta.resultado[pregunta.correcto]}", style = MaterialTheme.typography.displaySmall)
-        } else {
-            Text("Encuentra el resultado de:", fontWeight = FontWeight.Bold)
-            Text("${pregunta.valor1[pregunta.correcto]} × ${pregunta.valor2[pregunta.correcto]}", style = MaterialTheme.typography.displaySmall)
-        }
-        Spacer(Modifier.height(12.dp))
-
-
-        AssetImage(
-            path = "images/${pregunta.valor2[pregunta.correcto]}x${pregunta.valor1[pregunta.correcto]}" +
-                if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "a.gif" else "b.gif",
-            modifier = Modifier.width(80.dp),//.size(width = 56.dp, height = 76.dp),
-            maintainAspectRatio = true
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            pregunta.valor1.indices.forEach { opcion ->
-                val texto = if (configuracion.modo == ModoJuego.BUSCAR_MULTIPLICACION) {
-                    "${pregunta.valor1[opcion]} × ${pregunta.valor2[opcion]}"
-                } else {
-                    pregunta.resultado[opcion].toString()
-                }
-                TextButton(
-                    onClick = { onResponder(opcion) },
-                    enabled = opcion !in estado.opcionesDeshabilitadas && estado.opcionSeleccionada == null,
-                    shape = RectangleShape,
-                    modifier = Modifier.weight(1f).fillMaxWidth()
-                ) {
-                    AssetImage(
-                        path = "images/${pregunta.valor2[opcion]}x${pregunta.valor1[opcion]}" +
-                                if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "b.gif" else "a.gif",
-                            modifier = Modifier.fillMaxWidth(),
-                            maintainAspectRatio = true
-                    )
-                }
-            }
-        }
-        
-        Spacer(Modifier.height(8.dp))
-        OutlinedButton(onClick = onResultados, modifier = Modifier.fillMaxWidth()) { Text("Resultados") }
-        OutlinedButton(onClick = onInicio, modifier = Modifier.fillMaxWidth()) { Text("Inicio") }
-    }
-}
 
 @Composable
 private fun ResultadosScreen(questions: List<Question>, onVolver: () -> Unit) {
@@ -275,7 +203,7 @@ private fun CreditosScreen(onInicio: () -> Unit) {
 }
 
 @Composable
-private fun AppColumn(content: @Composable ColumnScope.() -> Unit) {
+fun AppColumn(content: @Composable ColumnScope.() -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -286,34 +214,39 @@ private fun AppColumn(content: @Composable ColumnScope.() -> Unit) {
     )
 }
 
-@Composable
-private fun AssetImage(
-    path: String,
-    modifier: Modifier = Modifier,
-    maintainAspectRatio: Boolean = false
-) {
-    val context = LocalContext.current
-    val bitmap = remember(path) {
-        runCatching { context.assets.open(path).use(BitmapFactory::decodeStream) }.getOrNull()
-    }
-    if (bitmap != null) {
-        val imageModifier = if (maintainAspectRatio) {
-            modifier.aspectRatio(bitmap.width.toFloat() / bitmap.height)
-        } else {
-            modifier
-        }
-        Image(bitmap = bitmap.asImageBitmap(), contentDescription = null, modifier = imageModifier)
-    } else {
-        Card(modifier = modifier) {}
-    }
-}
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun DefaultPreview() {
-    Surface(modifier = Modifier.fillMaxSize(), color = colorResource(R.color.cardview_light_background)) {
-    //Scaffold() { paddingValues ->
+fun MultiplicatioPreview() {
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "titulo",
+                        fontSize = 19.sp
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White.copy(alpha = 0.7f)
+                ),
+                navigationIcon = {
+                    IconButton(onClick = {  }) {
+
+                    }
+                }
+            )
+        }
+
+    ) { paddingValues ->
+        HomeScreen(
+            onJugar = {},
+            onCreditos = {},
+            paddingValues
+        )
+        /*
         JuegoScreen(
             estado = GameState(
                 pantalla = PantallaJuego.Pregunta,
@@ -329,12 +262,13 @@ fun DefaultPreview() {
                         resultado = intArrayOf(6, 8, 10),
                         correcto = 0
                     )
-                )
+                ),
             ),
             onResponder = {},
             onResultados = {},
             onInicio = {},
-         //   paddingValues
+            paddingValues
         )
+        */
     }
 }
