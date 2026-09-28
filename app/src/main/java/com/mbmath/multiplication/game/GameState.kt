@@ -3,17 +3,17 @@ package com.mbmath.multiplication.game
 import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.Question
 
-sealed interface PantallaJuego {
-    data object Inicio : PantallaJuego
-    data class Ayuda(val configuracion: GameConfiguration) : PantallaJuego
-    data object Pregunta : PantallaJuego
-    data object Resultados : PantallaJuego
-    data object Felicitacion : PantallaJuego
-    data object Creditos : PantallaJuego
+sealed interface Screens {
+    data object Home : Screens
+    data class Instructions(val configuration: GameConfiguration) : Screens
+    data object Play : Screens
+    data object Score : Screens
+    data object Results : Screens
+    data object Credits : Screens
 }
 
 data class GameState(
-    val pantalla: PantallaJuego = PantallaJuego.Inicio,
+    val pantalla: Screens = Screens.Home,
     val configuracion: GameConfiguration? = null,
     val questions: List<Question> = emptyList(),
     val indice: Int = 0,

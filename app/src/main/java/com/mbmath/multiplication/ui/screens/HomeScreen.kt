@@ -1,15 +1,18 @@
 package com.mbmath.multiplication.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,148 +44,83 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import com.mbmath.multiplication.ui.components.AppScaffold
+import com.mbmath.multiplication.ui.components.AppSelector
 
 @Composable
 fun HomeScreen(
     onJugar: (GameConfiguration) -> Unit,
-    onCreditos: () -> Unit,
-    paddingValues: PaddingValues
+    onCredits : () -> Unit,
 ) {
     var jugador by remember { mutableStateOf("") }
     var modo by remember { mutableStateOf(ModoJuego.BUSCAR_RESULTADO) }
     var dificultad by remember { mutableStateOf(Dificultad.FACIL) }
     var selectedDestination by remember { mutableStateOf(0) }
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .padding(0.dp),
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = selectedDestination == 0,
+    AppScaffold(
+        onCredits = onCredits,
+        content = { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = jugador,
+                    onValueChange = { jugador = it },
+                    label = { Text("Ingresa tu nombre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(10.dp))
+
+                AppSelector(
+                    "Tipo de juego",
+                    ModoJuego.entries,
+                    modo,
+                    { modo = it }) { it.titulo }
+
+                Spacer(Modifier.height(10.dp))
+
+                AppSelector(
+                    "Dificultad",
+                    Dificultad.entries,
+                    dificultad,
+                    { dificultad = it }) { it.titulo }
+
+                Spacer(Modifier.height(20.dp))
+
+                Button(
                     onClick = {
-                        selectedDestination = 0
                         onJugar(GameConfiguration(jugador.trim(), modo, dificultad))
                     },
                     enabled = jugador.isNotBlank(),
-                    icon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
-                    label = { Text("Jugar") }
-                )
-                NavigationBarItem(
-                    selected = selectedDestination == 1,
-                    onClick = {
-                        selectedDestination = 1
-                        onCreditos()
-                    },
-                    icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                    label = { Text("Créditos") }
-                )
-            }
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .padding(20.dp)
-        ) {
-            OutlinedTextField(
-                value = jugador,
-                onValueChange = { jugador = it },
-                label = { Text("Ingresa tu nombre") },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            Selector(
-                "Tipo de juego",
-                ModoJuego.entries,
-                modo,
-                { modo = it }) { it.titulo }
-
-            Spacer(Modifier.height(12.dp))
-
-            Selector(
-                "Dificultad",
-                Dificultad.entries,
-                dificultad,
-                { dificultad = it }) { it.titulo }
-
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalLayoutApi::class)
-private fun <T> Selector(
-    etiqueta: String,
-    opciones: List<T>,
-    seleccion: T,
-    onSeleccion: (T) -> Unit,
-    texto: (T) -> String
-) {
-    Column(modifier = Modifier.padding(top = 12.dp)) {
-        Text(
-            etiqueta,
-            modifier = Modifier.padding(bottom = 5.dp),
-            fontWeight = FontWeight.Bold,
-        )
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            opciones.forEach { opcion ->
-                OutlinedButton(
-                    onClick = { onSeleccion(opcion) },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFF2E7D32),
-                        contentColor = Color.White
-                    ),
-                    contentPadding = PaddingValues(10.dp)
+                    //modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (opcion == seleccion) "✓ ${texto(opcion)}" else texto(opcion))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.PlayArrow, contentDescription = null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Comenzar")
+                    }
                 }
+
             }
         }
-    }
+    )
 }
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text("Multiplicación",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 19.sp
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1565C0),
-                    scrolledContainerColor = Color.Unspecified,
-                    navigationIconContentColor = Color.Unspecified,
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.Unspecified
-                ),
-            )
-        }
-
-    ) { paddingValues ->
-
-        HomeScreen(
-            onJugar = {},
-            onCreditos = {},
-            paddingValues
-        )
-    }
+    HomeScreen(
+        onJugar = {},
+        onCredits  = {}
+    )
 }

@@ -18,18 +18,18 @@ class GameViewModel : ViewModel() {
 
     private var modoActual = ModoJuego.BUSCAR_RESULTADO
 
-    fun mostrarCreditos() {
-        _estado.value = _estado.value.copy(pantalla = PantallaJuego.Creditos)
+    fun onCredits() {
+        _estado.value = _estado.value.copy(pantalla = Screens.Credits)
     }
 
-    fun volverInicio() {
+    fun onHome() {
         _estado.value = GameState()
     }
 
     fun mostrarAyuda(configuracion: GameConfiguration) {
         modoActual = configuracion.modo
         _estado.value = _estado.value.copy(
-            pantalla = PantallaJuego.Ayuda(configuracion),
+            pantalla = Screens.Instructions(configuracion),
             configuracion = configuracion
         )
     }
@@ -39,7 +39,7 @@ class GameViewModel : ViewModel() {
         modoActual = configuracion.modo
         val pregunta = crearPregunta(1)
         _estado.value = _estado.value.copy(
-            pantalla = PantallaJuego.Pregunta,
+            pantalla = Screens.Play,
             questions = listOf(pregunta),
             indice = 0,
             etapa = 1,
@@ -82,18 +82,18 @@ class GameViewModel : ViewModel() {
     }
 
     fun mostrarResultados() {
-        _estado.value = _estado.value.copy(pantalla = PantallaJuego.Resultados)
+        _estado.value = _estado.value.copy(pantalla = Screens.Score)
     }
 
     fun volverAlJuego() {
-        _estado.value = _estado.value.copy(pantalla = PantallaJuego.Pregunta)
+        _estado.value = _estado.value.copy(pantalla = Screens.Play)
     }
 
     private fun avanzar() {
         val actual = _estado.value
         if (actual.indice >= 23) {
             _estado.value = actual.copy(
-                pantalla = PantallaJuego.Felicitacion,
+                pantalla = Screens.Results,
                 indice = 24
             )
             return
