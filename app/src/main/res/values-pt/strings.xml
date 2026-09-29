@@ -23,7 +23,7 @@
     <string name="unanswered">Sem resposta</string>
     <string name="correct">Correta</string>
     <string name="incorrect">Incorreta</string>
-    <string name="score_question">Pergunta %1$d: %2$d × %3$d = %4$s (%5$s)</string>
+    <string name="score_question">Pergunta %1$d: %2$d × %3$d = %4$s</string>
     <string name="feedback_correct">Correto! %1$d × %2$d = %3$d</string>
     <string name="feedback_incorrect">Incorreto</string>
     <string name="congratulations">Parabéns, %1$s!</string>

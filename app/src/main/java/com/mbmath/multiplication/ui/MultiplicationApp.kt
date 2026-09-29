@@ -43,8 +43,7 @@ fun MultiplicationApp(viewModel: GameViewModel) {
             state = state,
             submitAnswer = viewModel::submitAnswer,
             showResults = viewModel::showResults,
-            onHome = viewModel::onHome,
-            onCredits = viewModel::onCredits,
+            onHome = viewModel::onHome
         )
         Screens.Score -> ScoreScreen(
             questions = state.questions,

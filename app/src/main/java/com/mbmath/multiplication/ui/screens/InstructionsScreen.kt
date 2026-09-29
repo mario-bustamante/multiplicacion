@@ -49,6 +49,7 @@ fun InstructionsScreen(
     onCredits: () -> Unit
 ) {
     AppScaffold(
+        title = stringResource(R.string.instructions_title),
         onHome = onHome,
         onCredits = onCredits,
         content = { innerPadding ->
@@ -59,15 +60,8 @@ fun InstructionsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 //verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    stringResource(R.string.instructions_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(30.dp))
-                AssetImage("images/personaje.png", Modifier.size(160.dp))
-                Spacer(Modifier.height(30.dp))
+                AssetImage("images/personaje.png", Modifier.size(150.dp))
+                Spacer(Modifier.height(20.dp))
                 Text(
                     stringResource(
                         R.string.instructions_selected,
@@ -77,12 +71,12 @@ fun InstructionsScreen(
                     ),
                     textAlign = TextAlign.Center
                 )
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(10.dp))
                 Text(
                     stringResource(R.string.instructions_body),
                     textAlign = TextAlign.Center
                 )
-                Spacer(Modifier.height(30.dp))
+                Spacer(Modifier.height(15.dp))
 
                 Button(
                     onClick = onPlay,

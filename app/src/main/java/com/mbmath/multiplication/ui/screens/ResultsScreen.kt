@@ -25,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.model.Question
-import com.mbmath.multiplication.ui.components.AppColumn
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AssetImage
 import com.mbmath.multiplication.R

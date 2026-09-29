@@ -23,7 +23,7 @@
     <string name="unanswered">未回答</string>
     <string name="correct">正解</string>
     <string name="incorrect">不正解</string>
-    <string name="score_question">問題 %1$d：%2$d × %3$d = %4$s（%5$s）</string>
+    <string name="score_question">問題 %1$d：%2$d × %3$d = %4$s</string>
     <string name="feedback_correct">正解！ %1$d × %2$d = %3$d</string>
     <string name="feedback_incorrect">不正解</string>
     <string name="congratulations">おめでとうございます、%1$sさん！</string>

@@ -50,6 +50,7 @@ fun AppScaffold(
     title: String = "",
     onHome: (() -> Unit)? = null,
     onCredits: (() -> Unit)? = null,
+    showResults: (() -> Unit)? = null,
     showLanguageSelector: Boolean = false
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -120,7 +121,17 @@ fun AppScaffold(
                         IconButton(onClick = onClick) {
                             Icon(
                                 imageVector = Icons.Default.Info,
-                                contentDescription = stringResource(R.string.credits)
+                                contentDescription = stringResource(R.string.credits),
+                                tint = Color.LightGray
+                            )
+                        }
+                    }
+                    showResults?.let { onClick ->
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = stringResource(R.string.credits),
+                                tint = Color.LightGray
                             )
                         }
                     }
@@ -130,7 +141,8 @@ fun AppScaffold(
                         IconButton(onClick = onClick) {
                             Icon(
                                 imageVector = Icons.Default.Home,
-                                contentDescription = stringResource(R.string.home)
+                                contentDescription = stringResource(R.string.home),
+                                tint = Color.LightGray
                             )
                         }
                     }

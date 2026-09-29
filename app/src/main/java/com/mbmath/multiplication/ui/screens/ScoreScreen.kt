@@ -1,5 +1,6 @@
 package com.mbmath.multiplication.ui.screens
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,14 +24,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.model.Question
-import com.mbmath.multiplication.ui.components.AppColumn
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.R
+import com.mbmath.multiplication.ui.components.AppScore
 
 @Composable
 fun ScoreScreen(
@@ -48,33 +52,16 @@ fun ScoreScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
+                AppScore(
+                    questions = questions,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
+                        .padding(10.dp)
+                )
 
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    itemsIndexed(questions) { index, question ->
-                        val isCorrect = question.selectedOption == question.correctOptionIndex + 1
-                        val status = when {
-                            question.selectedOption == 0 -> stringResource(R.string.unanswered)
-                            isCorrect -> stringResource(R.string.correct)
-                            else -> stringResource(R.string.incorrect)
-                        }
-                        val answer = if (isCorrect) {
-                            question.results[question.correctOptionIndex].toString()
-                        } else {
-                            "??"
-                        }
-                        Text(
-                            stringResource(
-                                R.string.score_question,
-                                index + 1,
-                                question.factor1[question.correctOptionIndex],
-                                question.factor2[question.correctOptionIndex],
-                                answer,
-                                status
-                            ),
-                            modifier = Modifier.padding(vertical = 6.dp)
-                        )
-                    }
-                }
                 Spacer(Modifier.height(30.dp))
                 Button(
                     onClick = backToPlay,
@@ -108,7 +95,7 @@ fun ScoreScreenPreview() {
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(27, 8, 10),
             correctOptionIndex = 0,
-            selectedOption = 1
+            selectedOption = 2
         )
     )
 

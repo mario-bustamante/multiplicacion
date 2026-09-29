@@ -2,10 +2,12 @@ package com.mbmath.multiplication.ui.screens
 
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +19,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
@@ -43,8 +47,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -61,19 +71,20 @@ import com.mbmath.multiplication.ui.components.AssetImage
 import com.mbmath.multiplication.ui.components.localizedTitle
 import com.mbmath.multiplication.R
 import com.mbmath.multiplication.game.GameFeedback
+import com.mbmath.multiplication.ui.components.AppScore
 
 @Composable
 fun PlayScreen(
     state: GameState,
     submitAnswer: (Int) -> Unit,
     showResults: () -> Unit,
-    onHome: () -> Unit,
-    onCredits: () -> Unit
+    onHome: () -> Unit
 ) {
     val question = state.currentQuestion ?: return
     val configuration = state.configuration ?: return
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val context = LocalContext.current
+
     val feedbackText = when (val feedback = state.feedback) {
         GameFeedback.Incorrect -> stringResource(R.string.feedback_incorrect)
         is GameFeedback.Correct -> stringResource(
@@ -94,71 +105,52 @@ fun PlayScreen(
     AppScaffold(
         title = configuration.gameMode.localizedTitle(),
         onHome = onHome,
-        onCredits = onCredits,
+        showResults = showResults,
+        verticalScrollEnabled = false,
         content = { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.question_progress, state.questionIndex + 1), fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.weight(1f))
-                        Text(stringResource(R.string.stage, state.stage))
-                    }
-                    LinearProgressIndicator(
-                        progress = { state.progress },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(Modifier.height(12.dp))
-
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (configuration.gameMode != GameMode.FIND_RESULT) {
-                        Text(
-                            stringResource(R.string.find_multiplication_prompt, question.results[question.correctOptionIndex]),
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold
-                        )
-                    } else {
-                        Text(
-                            stringResource(
-                                R.string.find_result_prompt,
-                                question.factor1[question.correctOptionIndex],
-                                question.factor2[question.correctOptionIndex]
-                            ),
-                            modifier = Modifier.weight(1f),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Button(
-                        onClick = {
-                            showResults()
-                        },
-                        modifier = Modifier.wrapContentWidth()
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.CheckCircle, contentDescription = null)
-                            Spacer(Modifier.width(4.dp))
-                            Text(stringResource(R.string.results))
-                        }
-                    }
+                    Text(stringResource(R.string.question_progress, state.questionIndex + 1), fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.weight(1f))
+                    Text(stringResource(R.string.stage, state.stage))
                 }
+                LinearProgressIndicator(
+                    progress = { state.progress },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 Spacer(Modifier.height(12.dp))
 
-                BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                BoxWithConstraints(
+                    modifier = Modifier
+                        .then(
+                            if (isLandscape) {
+                                Modifier.fillMaxSize()
+                            } else {
+                                Modifier.fillMaxWidth()
+                            }
+                        )
+                        //.clip(RoundedCornerShape(10.dp))
+                        //.border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
+                        //.padding(10.dp)
+                ) {
                     val imageMaxHeight = maxHeight * 0.65f
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (isLandscape) Modifier.height(imageMaxHeight) else Modifier)
+                            .then(
+                                if (isLandscape) {
+                                    Modifier.fillMaxSize()
+                                } else {
+                                    Modifier.fillMaxWidth()
+                                }
+                            )
                     ) {
                         TextButton(
                             onClick = { },
@@ -214,11 +206,25 @@ fun PlayScreen(
                         }
                     }
                 }
+
+              //  if (!isLandscape) {
+                    Spacer(Modifier.height(12.dp))
+                    if (!isLandscape) {
+                        AppScore(
+                            questions = state.questions,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                //.weight(1f)
+                                .clip(RoundedCornerShape(10.dp))
+                                .border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
+                                .padding(10.dp)
+                        )
+                    }
+               // }
             }
         }
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, showSystemUi = true)
@@ -237,13 +243,27 @@ fun PlayScreenPreview() {
                     factor1 = intArrayOf(2, 4, 5),
                     factor2 = intArrayOf(3, 2, 2),
                     results = intArrayOf(6, 8, 10),
-                    correctOptionIndex = 0
-                )
+                    correctOptionIndex = 0,
+                    selectedOption = 0
+                ),
+                Question(
+                    factor1 = intArrayOf(2, 4, 5),
+                    factor2 = intArrayOf(3, 2, 2),
+                    results = intArrayOf(6, 8, 10),
+                    correctOptionIndex = 1,
+                    selectedOption = 1
+                ),
+                Question(
+                    factor1 = intArrayOf(2, 4, 5),
+                    factor2 = intArrayOf(3, 2, 2),
+                    results = intArrayOf(6, 8, 10),
+                    correctOptionIndex = 0,
+                    selectedOption = 0
+                ),
             ),
         ),
         submitAnswer = {},
         showResults = {},
-        onHome = {},
-        onCredits = {}
+        onHome = {}
     )
 }

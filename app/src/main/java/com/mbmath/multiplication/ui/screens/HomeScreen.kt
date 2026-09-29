@@ -95,7 +95,7 @@ fun HomeScreen(
                     difficulty,
                     { difficulty = it }) { it.localizedTitle() }
 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(15.dp))
 
                 Button(
                     onClick = {
