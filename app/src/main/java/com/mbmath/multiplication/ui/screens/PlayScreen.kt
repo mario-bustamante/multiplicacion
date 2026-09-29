@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
@@ -46,40 +45,54 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.game.Screens
-import com.mbmath.multiplication.model.Dificultad
+import com.mbmath.multiplication.model.Difficulty
 import com.mbmath.multiplication.model.GameConfiguration
-import com.mbmath.multiplication.model.ModoJuego
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AssetImage
+import com.mbmath.multiplication.ui.components.localizedTitle
+import com.mbmath.multiplication.R
+import com.mbmath.multiplication.game.GameFeedback
 
 @Composable
 fun PlayScreen(
-    estado: GameState,
-    onResponder: (Int) -> Unit,
-    onResultados: () -> Unit,
+    state: GameState,
+    submitAnswer: (Int) -> Unit,
+    showResults: () -> Unit,
     onHome: () -> Unit,
     onCredits: () -> Unit
 ) {
-    val pregunta = estado.questionActual ?: return
-    val configuracion = estado.configuracion ?: return
+    val question = state.currentQuestion ?: return
+    val configuration = state.configuration ?: return
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val context = LocalContext.current
+    val feedbackText = when (val feedback = state.feedback) {
+        GameFeedback.Incorrect -> stringResource(R.string.feedback_incorrect)
+        is GameFeedback.Correct -> stringResource(
+            R.string.feedback_correct,
+            feedback.factor1,
+            feedback.factor2,
+            feedback.result
+        )
+        null -> ""
+    }
 
-    LaunchedEffect(estado.mensaje) {
-        if (estado.mensaje.isNotBlank()) {
-            Toast.makeText(context, estado.mensaje, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(feedbackText) {
+        if (feedbackText.isNotBlank()) {
+            Toast.makeText(context, feedbackText, Toast.LENGTH_SHORT).show()
         }
     }
 
     AppScaffold(
-        title = configuracion.modo.titulo,
+        title = configuration.gameMode.localizedTitle(),
         onHome = onHome,
         onCredits = onCredits,
         content = { innerPadding ->
@@ -92,12 +105,12 @@ fun PlayScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Pregunta ${estado.indice + 1} de 24", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.question_progress, state.questionIndex + 1), fontWeight = FontWeight.Bold)
                         Spacer(Modifier.weight(1f))
-                        Text("Etapa ${estado.etapa}")
+                        Text(stringResource(R.string.stage, state.stage))
                     }
                     LinearProgressIndicator(
-                        progress = { estado.progreso },
+                        progress = { state.progress },
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(12.dp))
@@ -106,15 +119,19 @@ fun PlayScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (configuracion.modo != ModoJuego.BUSCAR_RESULTADO) {
+                    if (configuration.gameMode != GameMode.FIND_RESULT) {
                         Text(
-                            "Encuentra la multiplicación de: ${pregunta.resultado[pregunta.correcto]}",
+                            stringResource(R.string.find_multiplication_prompt, question.results[question.correctOptionIndex]),
                             modifier = Modifier.weight(1f),
                             fontWeight = FontWeight.Bold
                         )
                     } else {
                         Text(
-                            "Encuentra el resultado de: ${pregunta.valor1[pregunta.correcto]} × ${pregunta.valor2[pregunta.correcto]}",
+                            stringResource(
+                                R.string.find_result_prompt,
+                                question.factor1[question.correctOptionIndex],
+                                question.factor2[question.correctOptionIndex]
+                            ),
                             modifier = Modifier.weight(1f),
                             fontWeight = FontWeight.Bold
                         )
@@ -122,14 +139,14 @@ fun PlayScreen(
 
                     Button(
                         onClick = {
-                            onResultados()
+                            showResults()
                         },
                         modifier = Modifier.wrapContentWidth()
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Check, contentDescription = null)
+                            Icon(Icons.Default.CheckCircle, contentDescription = null)
                             Spacer(Modifier.width(4.dp))
-                            Text("Resultados")
+                            Text(stringResource(R.string.results))
                         }
                     }
                 }
@@ -154,8 +171,8 @@ fun PlayScreen(
                                 .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
                         ) {
                             AssetImage(
-                                path = "images/${pregunta.valor2[pregunta.correcto]}x${pregunta.valor1[pregunta.correcto]}" +
-                                        if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "a.gif" else "b.gif",
+                                path = "images/${question.factor2[question.correctOptionIndex]}x${question.factor1[question.correctOptionIndex]}" +
+                                    if (configuration.gameMode == GameMode.FIND_RESULT) "a.gif" else "b.gif",
                                 modifier = if (isLandscape) {
                                     Modifier.fillMaxHeight()
                                 } else {
@@ -166,15 +183,15 @@ fun PlayScreen(
                             )
                         }
 
-                        pregunta.valor1.indices.forEach { opcion ->
-                            val texto = if (configuracion.modo == ModoJuego.BUSCAR_MULTIPLICACION) {
-                                "${pregunta.valor1[opcion]} × ${pregunta.valor2[opcion]}"
+                        question.factor1.indices.forEach { optionIndex ->
+                            val optionText = if (configuration.gameMode == GameMode.FIND_MULTIPLICATION) {
+                                "${question.factor1[optionIndex]} × ${question.factor2[optionIndex]}"
                             } else {
-                                pregunta.resultado[opcion].toString()
+                                question.results[optionIndex].toString()
                             }
                             TextButton(
-                                onClick = { onResponder(opcion) },
-                                enabled = opcion !in estado.opcionesDeshabilitadas && estado.opcionSeleccionada == null,
+                                onClick = { submitAnswer(optionIndex) },
+                                enabled = optionIndex !in state.disabledOptions && state.selectedOptionIndex == null,
                                 shape = RectangleShape,
                                 contentPadding = PaddingValues(0.dp),
                                 modifier = Modifier
@@ -183,8 +200,8 @@ fun PlayScreen(
                                     .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
                             ) {
                                 AssetImage(
-                                    path = "images/${pregunta.valor2[opcion]}x${pregunta.valor1[opcion]}" +
-                                            if (configuracion.modo == ModoJuego.BUSCAR_RESULTADO) "b.gif" else "a.gif",
+                                        path = "images/${question.factor2[optionIndex]}x${question.factor1[optionIndex]}" +
+                                            if (configuration.gameMode == GameMode.FIND_RESULT) "b.gif" else "a.gif",
                                     modifier = if (isLandscape) {
                                         Modifier.fillMaxHeight()
                                     } else {
@@ -208,24 +225,24 @@ fun PlayScreen(
 @Composable
 fun PlayScreenPreview() {
     PlayScreen(
-        estado = GameState(
-            pantalla = Screens.Play,
-            configuracion = GameConfiguration(
-                jugador = "Ana",
-                modo = ModoJuego.BUSCAR_RESULTADO,
-                dificultad = Dificultad.FACIL
+        state = GameState(
+            screen = Screens.Play,
+            configuration = GameConfiguration(
+                player = "Ana",
+                gameMode = GameMode.FIND_RESULT,
+                difficulty = Difficulty.EASY
             ),
             questions = listOf(
                 Question(
-                    valor1 = intArrayOf(2, 4, 5),
-                    valor2 = intArrayOf(3, 2, 2),
-                    resultado = intArrayOf(6, 8, 10),
-                    correcto = 0
+                    factor1 = intArrayOf(2, 4, 5),
+                    factor2 = intArrayOf(3, 2, 2),
+                    results = intArrayOf(6, 8, 10),
+                    correctOptionIndex = 0
                 )
             ),
         ),
-        onResponder = {},
-        onResultados = {},
+        submitAnswer = {},
+        showResults = {},
         onHome = {},
         onCredits = {}
     )

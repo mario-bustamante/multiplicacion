@@ -3,7 +3,7 @@ package com.mbmath.multiplication.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mbmath.multiplication.model.GameConfiguration
-import com.mbmath.multiplication.model.ModoJuego
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,123 +13,127 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class GameViewModel : ViewModel() {
-    private val _estado = MutableStateFlow(GameState())
-    val estado: StateFlow<GameState> = _estado.asStateFlow()
+    private val _state = MutableStateFlow(GameState())
+    val state: StateFlow<GameState> = _state.asStateFlow()
 
-    private var modoActual = ModoJuego.BUSCAR_RESULTADO
+    private var currentGameMode = GameMode.FIND_RESULT
 
     fun onCredits() {
-        _estado.value = _estado.value.copy(pantalla = Screens.Credits)
+        _state.value = _state.value.copy(screen = Screens.Credits)
     }
 
     fun onHome() {
-        _estado.value = GameState()
+        _state.value = GameState()
     }
 
-    fun mostrarAyuda(configuracion: GameConfiguration) {
-        modoActual = configuracion.modo
-        _estado.value = _estado.value.copy(
-            pantalla = Screens.Instructions(configuracion),
-            configuracion = configuracion
+    fun showInstructions(configuration: GameConfiguration) {
+        currentGameMode = configuration.gameMode
+        _state.value = _state.value.copy(
+            screen = Screens.Instructions(configuration),
+            configuration = configuration
         )
     }
 
-    fun comenzar() {
-        val configuracion = _estado.value.configuracion ?: return
-        modoActual = configuracion.modo
-        val pregunta = crearPregunta(1)
-        _estado.value = _estado.value.copy(
-            pantalla = Screens.Play,
-            questions = listOf(pregunta),
-            indice = 0,
-            etapa = 1,
-            contadorEtapa = 1,
-            mensaje = "",
-            opcionSeleccionada = null,
-            opcionesDeshabilitadas = emptySet()
+    fun onPlay() {
+        val configuration = _state.value.configuration ?: return
+        currentGameMode = configuration.gameMode
+        val question = createQuestion(1)
+        _state.value = _state.value.copy(
+            screen = Screens.Play,
+            questions = listOf(question),
+            questionIndex = 0,
+            stage = 1,
+            stageQuestionCount = 1,
+            feedback = null,
+            selectedOptionIndex = null,
+            disabledOptions = emptySet()
         )
     }
 
-    fun responder(opcion: Int) {
-        val actual = _estado.value
-        val pregunta = actual.questionActual ?: return
-        if (opcion in actual.opcionesDeshabilitadas || actual.opcionSeleccionada != null) return
+    fun submitAnswer(optionIndex: Int) {
+        val currentState = _state.value
+        val question = currentState.currentQuestion ?: return
+        if (optionIndex in currentState.disabledOptions || currentState.selectedOptionIndex != null) return
 
-        val correcta = opcion == pregunta.correcto
-        val preguntas = actual.questions.toMutableList()
-        preguntas[actual.indice] = pregunta.responder(opcion)
+        val isCorrect = optionIndex == question.correctOptionIndex
+        val updatedQuestions = currentState.questions.toMutableList()
+        updatedQuestions[currentState.questionIndex] = question.selectOption(optionIndex)
 
-        if (!correcta) {
-            _estado.value = actual.copy(
-                questions = preguntas,
-                mensaje = "Incorrecto",
-                opcionesDeshabilitadas = actual.opcionesDeshabilitadas + opcion
+        if (!isCorrect) {
+            _state.value = currentState.copy(
+                questions = updatedQuestions,
+                feedback = GameFeedback.Incorrect,
+                disabledOptions = currentState.disabledOptions + optionIndex
             )
             return
         }
 
-        val resultado = pregunta.resultado[pregunta.correcto]
-        _estado.value = actual.copy(
-            questions = preguntas,
-            mensaje = "Correcto   ${pregunta.valor1[pregunta.correcto]} x ${pregunta.valor2[pregunta.correcto]} = $resultado",
-            opcionSeleccionada = opcion
+        val result = question.results[question.correctOptionIndex]
+        _state.value = currentState.copy(
+            questions = updatedQuestions,
+            feedback = GameFeedback.Correct(
+                factor1 = question.factor1[question.correctOptionIndex],
+                factor2 = question.factor2[question.correctOptionIndex],
+                result = result
+            ),
+            selectedOptionIndex = optionIndex
         )
 
         viewModelScope.launch {
-            delay(2000)
-            avanzar()
+            delay(1000)
+            advanceToNextQuestion()
         }
     }
 
-    fun mostrarResultados() {
-        _estado.value = _estado.value.copy(pantalla = Screens.Score)
+    fun showResults() {
+        _state.value = _state.value.copy(screen = Screens.Score)
     }
 
-    fun volverAlJuego() {
-        _estado.value = _estado.value.copy(pantalla = Screens.Play)
+    fun backToPlay() {
+        _state.value = _state.value.copy(screen = Screens.Play)
     }
 
-    private fun avanzar() {
-        val actual = _estado.value
-        if (actual.indice >= 23) {
-            _estado.value = actual.copy(
-                pantalla = Screens.Results,
-                indice = 24
+    private fun advanceToNextQuestion() {
+        val currentState = _state.value
+        if (currentState.questionIndex >= 23) {
+            _state.value = currentState.copy(
+                screen = Screens.Results,
+                questionIndex = 24
             )
             return
         }
 
-        val siguienteContador = if (actual.contadorEtapa == 3) 1 else actual.contadorEtapa + 1
-        val siguienteEtapa = if (actual.contadorEtapa == 3) actual.etapa + 1 else actual.etapa
-        val siguiente = crearPregunta(siguienteEtapa)
-        _estado.value = actual.copy(
-            questions = actual.questions + siguiente,
-            indice = actual.indice + 1,
-            etapa = siguienteEtapa,
-            contadorEtapa = siguienteContador,
-            mensaje = "",
-            opcionSeleccionada = null,
-            opcionesDeshabilitadas = emptySet()
+        val nextStageQuestionCount = if (currentState.stageQuestionCount == 3) 1 else currentState.stageQuestionCount + 1
+        val nextStage = if (currentState.stageQuestionCount == 3) currentState.stage + 1 else currentState.stage
+        val nextQuestion = createQuestion(nextStage)
+        _state.value = currentState.copy(
+            questions = currentState.questions + nextQuestion,
+            questionIndex = currentState.questionIndex + 1,
+            stage = nextStage,
+            stageQuestionCount = nextStageQuestionCount,
+            feedback = null,
+            selectedOptionIndex = null,
+            disabledOptions = emptySet()
         )
     }
 
-    private fun crearPregunta(etapa: Int): Question {
-        val valores = mutableListOf<Pair<Int, Int>>()
-        while (valores.size < 3) {
-            val valor = valoresDeEtapa(etapa)
-            if (valor !in valores) valores += valor
+    private fun createQuestion(stage: Int): Question {
+        val factorPairs = mutableListOf<Pair<Int, Int>>()
+        while (factorPairs.size < 3) {
+            val factorPair = valuesForStage(stage)
+            if (factorPair !in factorPairs) factorPairs += factorPair
         }
-        val resultados = valores.map { (valor1, valor2) -> valor1 * valor2 }.toIntArray()
+        val results = factorPairs.map { (factor1, factor2) -> factor1 * factor2 }.toIntArray()
         return Question(
-            valor1 = valores.map { it.first }.toIntArray(),
-            valor2 = valores.map { it.second }.toIntArray(),
-            resultado = resultados,
-            correcto = Random.nextInt(0, 3)
+            factor1 = factorPairs.map { it.first }.toIntArray(),
+            factor2 = factorPairs.map { it.second }.toIntArray(),
+            results = results,
+            correctOptionIndex = Random.nextInt(0, 3)
         )
     }
 
-    private fun valoresDeEtapa(etapa: Int): Pair<Int, Int> {
-        val valor1 = when (etapa) {
+    private fun valuesForStage(stage: Int): Pair<Int, Int> {
+        val factor1 = when (stage) {
             1 -> 1
             2 -> Random.nextInt(2, 4)
             3 -> Random.nextInt(4, 6)
@@ -139,6 +143,6 @@ class GameViewModel : ViewModel() {
             7 -> 9
             else -> Random.nextInt(1, 10)
         }
-        return valor1 to Random.nextInt(1, 10)
+        return factor1 to Random.nextInt(1, 10)
     }
 }

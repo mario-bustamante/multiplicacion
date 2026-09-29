@@ -12,20 +12,25 @@ sealed interface Screens {
     data object Credits : Screens
 }
 
-data class GameState(
-    val pantalla: Screens = Screens.Home,
-    val configuracion: GameConfiguration? = null,
-    val questions: List<Question> = emptyList(),
-    val indice: Int = 0,
-    val etapa: Int = 1,
-    val contadorEtapa: Int = 1,
-    val mensaje: String = "",
-    val opcionSeleccionada: Int? = null,
-    val opcionesDeshabilitadas: Set<Int> = emptySet()
-) {
-    val questionActual: Question?
-        get() = questions.getOrNull(indice)
+sealed interface GameFeedback {
+    data object Incorrect : GameFeedback
+    data class Correct(val factor1: Int, val factor2: Int, val result: Int) : GameFeedback
+}
 
-    val progreso: Float
-        get() = ((indice + 1).coerceAtMost(24)) / 24f
+data class GameState(
+    val screen: Screens = Screens.Home,
+    val configuration: GameConfiguration? = null,
+    val questions: List<Question> = emptyList(),
+    val questionIndex: Int = 0,
+    val stage: Int = 1,
+    val stageQuestionCount: Int = 1,
+    val feedback: GameFeedback? = null,
+    val selectedOptionIndex: Int? = null,
+    val disabledOptions: Set<Int> = emptySet()
+) {
+    val currentQuestion: Question?
+        get() = questions.getOrNull(questionIndex)
+
+    val progress: Float
+        get() = ((questionIndex + 1).coerceAtMost(24)) / 24f
 }

@@ -1,19 +1,19 @@
 package com.mbmath.multiplication.model
 
-enum class ModoJuego(val titulo: String) {
-    BUSCAR_RESULTADO("Buscar Resultado"),
-    BUSCAR_MULTIPLICACION("Buscar Multiplicación"),
-    COMBINADO("Combinado")
+enum class GameMode {
+    FIND_RESULT,
+    FIND_MULTIPLICATION,
+    MIXED
 }
 
-enum class Dificultad(val titulo: String) {
-    FACIL("Fácil"),
-    INTERMEDIO("Intermedio"),
-    AVANZADO("Avanzado")
+enum class Difficulty {
+    EASY,
+    INTERMEDIATE,
+    ADVANCED
 }
 
 data class GameConfiguration(
-    val jugador: String,
-    val modo: ModoJuego,
-    val dificultad: Dificultad
+    val player: String,
+    val gameMode: GameMode,
+    val difficulty: Difficulty
 )

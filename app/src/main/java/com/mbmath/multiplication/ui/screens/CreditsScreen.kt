@@ -15,20 +15,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.mbmath.multiplication.model.Dificultad
-import com.mbmath.multiplication.model.GameConfiguration
-import com.mbmath.multiplication.model.ModoJuego
-
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AssetImage
+import com.mbmath.multiplication.R
 
 @Composable
 fun CreditsScreen(onHome: () -> Unit) {
     AppScaffold(
-        title = "Créditos",
+        title = stringResource(R.string.credits),
         onHome = onHome,
         content = { innerPadding ->
 
@@ -40,11 +38,11 @@ fun CreditsScreen(onHome: () -> Unit) {
             ) {
                 AssetImage("images/personaje.png", Modifier.size(150.dp))
                 Spacer(Modifier.height(30.dp))
-                Text("Diseñado: Daniela Alejandra Olivares Diaz")
+                Text(stringResource(R.string.designed_by))
                 Spacer(Modifier.height(10.dp))
-                Text("Implementado: Mario Bernardo Bustamante Aguilar")
+                Text(stringResource(R.string.implemented_by))
                 Spacer(Modifier.height(10.dp))
-                Text("Idea: Adriana Margot Mundaca Bugueño")
+                Text(stringResource(R.string.idea_by))
             }
         }
     )

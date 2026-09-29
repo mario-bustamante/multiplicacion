@@ -1,3 +1,38 @@
 <resources>
-    <string name="app_name">multiplicacion</string>
+    <string name="app_name">Multiplication</string>
+    <string name="enter_name">Enter your name</string>
+    <string name="game_mode">Game mode</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="start">Start</string>
+    <string name="mode_find_result">Find the Result</string>
+    <string name="mode_find_multiplication">Find the Multiplication</string>
+    <string name="mode_mixed">Mixed</string>
+    <string name="difficulty_easy">Easy</string>
+    <string name="difficulty_intermediate">Intermediate</string>
+    <string name="difficulty_advanced">Advanced</string>
+    <string name="instructions_title">Instructions</string>
+    <string name="instructions_selected">%1$s, you selected %2$s at %3$s difficulty.</string>
+    <string name="instructions_body">Look at the cards and select the matching answer.</string>
+    <string name="play">Play</string>
+    <string name="question_progress">Question %1$d of 24</string>
+    <string name="stage">Stage %1$d</string>
+    <string name="find_multiplication_prompt">Find the multiplication that equals: %1$d</string>
+    <string name="find_result_prompt">Find the result of: %1$d × %2$d</string>
+    <string name="results">Results</string>
+    <string name="unanswered">Unanswered</string>
+    <string name="correct">Correct</string>
+    <string name="incorrect">Incorrect</string>
+    <string name="feedback_incorrect">Incorrect</string>
+    <string name="score_question">Question %1$d: %2$d × %3$d = %4$s (%5$s)</string>
+    <string name="feedback_correct">Correct! %1$d × %2$d = %3$d</string>
+    <string name="congratulations">Congratulations, %1$s!</string>
+    <string name="completed_questions">You completed all 24 questions.</string>
+    <string name="back_home">Back to Home</string>
+    <string name="play_again">Play Again</string>
+    <string name="credits">Credits</string>
+    <string name="home">Home</string>
+    <string name="designed_by">Designed by: Daniela Alejandra Olivares Diaz</string>
+    <string name="implemented_by">Implemented by: Mario Bernardo Bustamante Aguilar</string>
+    <string name="idea_by">Idea by: Adriana Margot Mundaca Bugueño</string>
+    <string name="select_language">Select language</string>
 </resources>

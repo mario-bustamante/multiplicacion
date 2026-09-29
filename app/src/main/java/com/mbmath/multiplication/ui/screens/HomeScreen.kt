@@ -30,15 +30,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PlayArrow
-import com.mbmath.multiplication.model.Dificultad
+import com.mbmath.multiplication.model.Difficulty
 import com.mbmath.multiplication.model.GameConfiguration
-import com.mbmath.multiplication.model.ModoJuego
+import com.mbmath.multiplication.model.GameMode
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
@@ -46,19 +47,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AppSelector
+import com.mbmath.multiplication.ui.components.localizedTitle
+import com.mbmath.multiplication.R
 
 @Composable
 fun HomeScreen(
-    onJugar: (GameConfiguration) -> Unit,
+    showInstructions: (GameConfiguration) -> Unit,
     onCredits : () -> Unit,
 ) {
-    var jugador by remember { mutableStateOf("") }
-    var modo by remember { mutableStateOf(ModoJuego.BUSCAR_RESULTADO) }
-    var dificultad by remember { mutableStateOf(Dificultad.FACIL) }
-    var selectedDestination by remember { mutableStateOf(0) }
+    var player by remember { mutableStateOf("") }
+    var gameMode by remember { mutableStateOf(GameMode.FIND_RESULT) }
+    var difficulty by remember { mutableStateOf(Difficulty.EASY) }
 
     AppScaffold(
         onCredits = onCredits,
+        showLanguageSelector = true,
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -67,42 +70,44 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 OutlinedTextField(
-                    value = jugador,
-                    onValueChange = { jugador = it },
-                    label = { Text("Ingresa tu nombre") },
+                    value = player,
+                    onValueChange = { player = it },
+                    label = { Text(stringResource(R.string.enter_name)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                      //  .height(52.dp)
                 )
 
                 Spacer(Modifier.height(10.dp))
 
                 AppSelector(
-                    "Tipo de juego",
-                    ModoJuego.entries,
-                    modo,
-                    { modo = it }) { it.titulo }
+                    stringResource(R.string.game_mode),
+                    GameMode.entries,
+                    gameMode,
+                    { gameMode = it }) { it.localizedTitle() }
 
                 Spacer(Modifier.height(10.dp))
 
                 AppSelector(
-                    "Dificultad",
-                    Dificultad.entries,
-                    dificultad,
-                    { dificultad = it }) { it.titulo }
+                    stringResource(R.string.difficulty),
+                    Difficulty.entries,
+                    difficulty,
+                    { difficulty = it }) { it.localizedTitle() }
 
                 Spacer(Modifier.height(20.dp))
 
                 Button(
                     onClick = {
-                        onJugar(GameConfiguration(jugador.trim(), modo, dificultad))
+                        showInstructions(GameConfiguration(player.trim(), gameMode, difficulty))
                     },
-                    enabled = jugador.isNotBlank(),
+                    enabled = player.isNotBlank(),
                     //modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.PlayArrow, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Comenzar")
+                        Text(stringResource(R.string.start))
                     }
                 }
 
@@ -120,7 +125,7 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
-        onJugar = {},
+        showInstructions = {},
         onCredits  = {}
     )
 }

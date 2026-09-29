@@ -18,15 +18,15 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun <T> AppSelector(
-    etiqueta: String,
-    opciones: List<T>,
-    seleccion: T,
-    onSeleccion: (T) -> Unit,
-    texto: (T) -> String
+    label: String,
+    options: List<T>,
+    selection: T,
+    onSelection: (T) -> Unit,
+    text: @Composable (T) -> String
 ) {
     Column(modifier = Modifier.padding(top = 12.dp)) {
         Text(
-            etiqueta,
+            label,
             modifier = Modifier.padding(bottom = 5.dp),
             fontWeight = FontWeight.Bold,
         )
@@ -35,16 +35,16 @@ fun <T> AppSelector(
             verticalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            opciones.forEach { opcion ->
+            options.forEach { option ->
                 OutlinedButton(
-                    onClick = { onSeleccion(opcion) },
+                    onClick = { onSelection(option) },
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = Color(0xFF2E7D32),
                         contentColor = Color.White
                     ),
                     contentPadding = PaddingValues(10.dp)
                 ) {
-                    Text(if (opcion == seleccion) "✓ ${texto(opcion)}" else texto(opcion))
+                    Text(if (option == selection) "✓ ${text(option)}" else text(option))
                 }
             }
         }

@@ -23,19 +23,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppColumn
 import com.mbmath.multiplication.ui.components.AppScaffold
+import com.mbmath.multiplication.R
 
 @Composable
 fun ScoreScreen(
     questions: List<Question>,
-    onVolver: () -> Unit
+    backToPlay: () -> Unit
 ) {
     AppScaffold(
-        title = "Resultados",
+        title = stringResource(R.string.results),
         verticalScrollEnabled = false,
         content = { innerPadding ->
 
@@ -48,30 +50,40 @@ fun ScoreScreen(
 
 
                 LazyColumn(modifier = Modifier.weight(1f)) {
-                    itemsIndexed(questions) { indice, pregunta ->
-                        val correcta = pregunta.respuesta == pregunta.correcto + 1
-                        val estado = when {
-                            pregunta.respuesta == 0 -> "Sin respuesta"
-                            correcta -> "Correcta"
-                            else -> "Incorrecta"
+                    itemsIndexed(questions) { index, question ->
+                        val isCorrect = question.selectedOption == question.correctOptionIndex + 1
+                        val status = when {
+                            question.selectedOption == 0 -> stringResource(R.string.unanswered)
+                            isCorrect -> stringResource(R.string.correct)
+                            else -> stringResource(R.string.incorrect)
+                        }
+                        val answer = if (isCorrect) {
+                            question.results[question.correctOptionIndex].toString()
+                        } else {
+                            "??"
                         }
                         Text(
-                            "Pregunta ${indice + 1}: ${pregunta.valor1[pregunta.correcto]} × " +
-                                    "${pregunta.valor2[pregunta.correcto]} = " +
-                                    "${if (correcta) pregunta.resultado[pregunta.correcto] else "??"} ($estado)",
+                            stringResource(
+                                R.string.score_question,
+                                index + 1,
+                                question.factor1[question.correctOptionIndex],
+                                question.factor2[question.correctOptionIndex],
+                                answer,
+                                status
+                            ),
                             modifier = Modifier.padding(vertical = 6.dp)
                         )
                     }
                 }
                 Spacer(Modifier.height(30.dp))
                 Button(
-                    onClick = onVolver,
+                    onClick = backToPlay,
                     //modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Volver a jugar")
+                        Text(stringResource(R.string.play_again))
                     }
                 }
             }
@@ -85,23 +97,23 @@ fun ScoreScreen(
 fun ScoreScreenPreview() {
     val questions = listOf(
         Question(
-            valor1 = intArrayOf(2, 4, 5),
-            valor2 = intArrayOf(3, 2, 2),
-            resultado = intArrayOf(6, 8, 10),
-            correcto = 0,
-            respuesta = 1
+            factor1 = intArrayOf(2, 4, 5),
+            factor2 = intArrayOf(3, 2, 2),
+            results = intArrayOf(6, 8, 10),
+            correctOptionIndex = 0,
+            selectedOption = 1
         ),
         Question(
-            valor1 = intArrayOf(9, 4, 5),
-            valor2 = intArrayOf(3, 2, 2),
-            resultado = intArrayOf(27, 8, 10),
-            correcto = 0,
-            respuesta = 1
+            factor1 = intArrayOf(9, 4, 5),
+            factor2 = intArrayOf(3, 2, 2),
+            results = intArrayOf(27, 8, 10),
+            correctOptionIndex = 0,
+            selectedOption = 1
         )
     )
 
     ScoreScreen(
         questions = questions,
-        onVolver = {},
+        backToPlay = {},
     )
 }

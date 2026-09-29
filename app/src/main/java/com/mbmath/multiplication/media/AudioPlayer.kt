@@ -6,11 +6,11 @@ import android.media.MediaPlayer
 class AudioPlayer(private val context: Context) {
     private var player: MediaPlayer? = null
 
-    fun reproducir(nombre: String) {
+    fun play(name: String) {
         player?.release()
         player = runCatching {
             MediaPlayer().apply {
-                setDataSource(context.assets.openFd("audios/$nombre"))
+                setDataSource(context.assets.openFd("audios/$name"))
                 setOnCompletionListener { it.release() }
                 prepare()
                 start()
@@ -18,7 +18,7 @@ class AudioPlayer(private val context: Context) {
         }.getOrNull()
     }
 
-    fun liberar() {
+    fun release() {
         player?.release()
         player = null
     }

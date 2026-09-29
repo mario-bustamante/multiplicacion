@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Multiplicación</string>
+    <string name="enter_name">Ingresa tu nombre</string>
+    <string name="game_mode">Modo de juego</string>
+    <string name="difficulty">Dificultad</string>
+    <string name="start">Comenzar</string>
+    <string name="mode_find_result">Buscar resultado</string>
+    <string name="mode_find_multiplication">Buscar multiplicación</string>
+    <string name="mode_mixed">Combinado</string>
+    <string name="difficulty_easy">Fácil</string>
+    <string name="difficulty_intermediate">Intermedio</string>
+    <string name="difficulty_advanced">Avanzado</string>
+    <string name="instructions_title">Instrucciones</string>
+    <string name="instructions_selected">%1$s, seleccionaste %2$s con dificultad %3$s.</string>
+    <string name="instructions_body">Observa las cartas y selecciona la respuesta que corresponde.</string>
+    <string name="play">Jugar</string>
+    <string name="question_progress">Pregunta %1$d de 24</string>
+    <string name="stage">Etapa %1$d</string>
+    <string name="find_multiplication_prompt">Encuentra la multiplicación cuyo resultado es: %1$d</string>
+    <string name="find_result_prompt">Encuentra el resultado de: %1$d × %2$d</string>
+    <string name="results">Resultados</string>
+    <string name="unanswered">Sin respuesta</string>
+    <string name="correct">Correcta</string>
+    <string name="incorrect">Incorrecta</string>
+    <string name="score_question">Pregunta %1$d: %2$d × %3$d = %4$s (%5$s)</string>
+    <string name="feedback_correct">¡Correcto! %1$d × %2$d = %3$d</string>
+    <string name="feedback_incorrect">Incorrecto</string>
+    <string name="congratulations">¡Felicitaciones, %1$s!</string>
+    <string name="completed_questions">Completaste las 24 preguntas.</string>
+    <string name="back_home">Volver al inicio</string>
+    <string name="play_again">Volver a jugar</string>
+    <string name="credits">Créditos</string>
+    <string name="home">Inicio</string>
+    <string name="designed_by">Diseñado por: Daniela Alejandra Olivares Diaz</string>
+    <string name="implemented_by">Implementado por: Mario Bernardo Bustamante Aguilar</string>
+    <string name="idea_by">Idea de: Adriana Margot Mundaca Bugueño</string>
+    <string name="select_language">Seleccionar idioma</string>
+</resources>

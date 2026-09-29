@@ -26,32 +26,32 @@ import com.mbmath.multiplication.ui.screens.ScoreScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MultiplicationApp(viewModel: GameViewModel) {
-    val estado by viewModel.estado.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
-    when (val pantalla = estado.pantalla) {
+    when (val screen = state.screen) {
         Screens.Home -> HomeScreen(
-            onJugar = viewModel::mostrarAyuda,
+            showInstructions = viewModel::showInstructions,
             onCredits  = viewModel::onCredits
         )
         is Screens.Instructions -> InstructionsScreen(
-            configuration = pantalla.configuration,
-            onComenzar = viewModel::comenzar,
+            configuration = screen.configuration,
+            onPlay = viewModel::onPlay,
             onHome = viewModel::onHome,
             onCredits = viewModel::onCredits,
         )
         Screens.Play -> PlayScreen(
-            estado = estado,
-            onResponder = viewModel::responder,
-            onResultados = viewModel::mostrarResultados,
+            state = state,
+            submitAnswer = viewModel::submitAnswer,
+            showResults = viewModel::showResults,
             onHome = viewModel::onHome,
             onCredits = viewModel::onCredits,
         )
         Screens.Score -> ScoreScreen(
-            questions = estado.questions,
-            onVolver = viewModel::volverAlJuego
+            questions = state.questions,
+            backToPlay = viewModel::backToPlay
         )
         Screens.Results -> ResultsScreen(
-            estado = estado,
+            state = state,
             onHome = viewModel::onHome
         )
         Screens.Credits -> CreditsScreen(onHome = viewModel::onHome)
@@ -63,31 +63,8 @@ fun MultiplicationApp(viewModel: GameViewModel) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun MultiplicationAppPreview() {
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "titulo",
-                        fontSize = 19.sp
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White.copy(alpha = 0.7f)
-                ),
-                navigationIcon = {
-                    IconButton(onClick = {  }) {
-
-                    }
-                }
-            )
-        }
-
-    ) { paddingValues ->
-        HomeScreen(
-            onJugar = {},
-            onCredits  = {},
-        )
-    }
+    HomeScreen(
+        showInstructions = {},
+        onCredits  = {},
+    )
 }

@@ -27,21 +27,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.game.Screens
-import com.mbmath.multiplication.model.Dificultad
+import com.mbmath.multiplication.model.Difficulty
 import com.mbmath.multiplication.model.GameConfiguration
-import com.mbmath.multiplication.model.ModoJuego
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AssetImage
+import com.mbmath.multiplication.ui.components.localizedTitle
+import com.mbmath.multiplication.R
 
 @Composable
 fun InstructionsScreen(
     configuration: GameConfiguration,
-    onComenzar: () -> Unit,
+    onPlay: () -> Unit,
     onHome: () -> Unit,
     onCredits: () -> Unit
 ) {
@@ -57,7 +60,7 @@ fun InstructionsScreen(
                 //verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "Instrucciones",
+                    stringResource(R.string.instructions_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -66,25 +69,29 @@ fun InstructionsScreen(
                 AssetImage("images/personaje.png", Modifier.size(160.dp))
                 Spacer(Modifier.height(30.dp))
                 Text(
-                    "${configuration.jugador.replaceFirstChar { it.uppercase() }}, seleccionaste " +
-                            "${configuration.modo.titulo} con dificultad ${configuration.dificultad.titulo}.",
+                    stringResource(
+                        R.string.instructions_selected,
+                        configuration.player.replaceFirstChar { it.uppercase() },
+                        configuration.gameMode.localizedTitle(),
+                        configuration.difficulty.localizedTitle()
+                    ),
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(20.dp))
                 Text(
-                    "Observa las cartas y selecciona la respuesta que corresponde.",
+                    stringResource(R.string.instructions_body),
                     textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(30.dp))
 
                 Button(
-                    onClick = onComenzar,
+                    onClick = onPlay,
                     //modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.PlayArrow, contentDescription = null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Jugar")
+                        Text(stringResource(R.string.play))
                     }
                 }
             }
@@ -98,11 +105,11 @@ fun InstructionsScreen(
 fun InstructionsScreenPreview() {
     InstructionsScreen(
         configuration = GameConfiguration(
-                jugador = "Ana",
-                modo = ModoJuego.BUSCAR_RESULTADO,
-                dificultad = Dificultad.FACIL
+                player = "Ana",
+                gameMode = GameMode.FIND_RESULT,
+                difficulty = Difficulty.EASY
             ),
-        onComenzar = {},
+        onPlay = {},
         onHome = {},
         onCredits = {}
     )

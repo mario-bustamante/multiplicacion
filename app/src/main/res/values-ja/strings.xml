@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">かけ算</string>
+    <string name="enter_name">名前を入力</string>
+    <string name="game_mode">ゲームモード</string>
+    <string name="difficulty">難易度</string>
+    <string name="start">スタート</string>
+    <string name="mode_find_result">答えを探す</string>
+    <string name="mode_find_multiplication">かけ算を探す</string>
+    <string name="mode_mixed">ミックス</string>
+    <string name="difficulty_easy">かんたん</string>
+    <string name="difficulty_intermediate">ふつう</string>
+    <string name="difficulty_advanced">むずかしい</string>
+    <string name="instructions_title">遊び方</string>
+    <string name="instructions_selected">%1$sさん、%2$s（難易度：%3$s）を選びました。</string>
+    <string name="instructions_body">カードを見て、正しい答えを選んでください。</string>
+    <string name="play">プレイ</string>
+    <string name="question_progress">問題 %1$d / 24</string>
+    <string name="stage">ステージ %1$d</string>
+    <string name="find_multiplication_prompt">答えが %1$d になるかけ算を選んでください</string>
+    <string name="find_result_prompt">答えを求めてください：%1$d × %2$d</string>
+    <string name="results">結果</string>
+    <string name="unanswered">未回答</string>
+    <string name="correct">正解</string>
+    <string name="incorrect">不正解</string>
+    <string name="score_question">問題 %1$d：%2$d × %3$d = %4$s（%5$s）</string>
+    <string name="feedback_correct">正解！ %1$d × %2$d = %3$d</string>
+    <string name="feedback_incorrect">不正解</string>
+    <string name="congratulations">おめでとうございます、%1$sさん！</string>
+    <string name="completed_questions">24問すべてに答えました。</string>
+    <string name="back_home">ホームに戻る</string>
+    <string name="play_again">もう一度プレイ</string>
+    <string name="credits">クレジット</string>
+    <string name="home">ホーム</string>
+    <string name="designed_by">デザイン：Daniela Alejandra Olivares Diaz</string>
+    <string name="implemented_by">実装：Mario Bernardo Bustamante Aguilar</string>
+    <string name="idea_by">アイデア：Adriana Margot Mundaca Bugueño</string>
+    <string name="select_language">言語を選択</string>
+</resources>
