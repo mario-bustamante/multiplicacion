@@ -32,8 +32,8 @@
     <string name="play_again">Jogar novamente</string>
     <string name="credits">Créditos</string>
     <string name="home">Início</string>
-    <string name="designed_by">Design: Daniela Alejandra Olivares Diaz</string>
-    <string name="implemented_by">Desenvolvimento: Mario Bernardo Bustamante Aguilar</string>
-    <string name="idea_by">Ideia: Adriana Margot Mundaca Bugueño</string>
+    <string name="designed_by">Design: Daniela Olivares Diaz</string>
+    <string name="implemented_by">Desenvolvimento: Mario Bustamante Aguilar</string>
+    <string name="idea_by">Ideia: Adriana Mundaca Bugueño</string>
     <string name="select_language">Selecionar idioma</string>
 </resources>

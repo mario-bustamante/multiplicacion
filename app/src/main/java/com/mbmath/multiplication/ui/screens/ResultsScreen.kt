@@ -1,6 +1,7 @@
 package com.mbmath.multiplication.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
+import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.ui.components.AssetImage
 import com.mbmath.multiplication.R
 
@@ -42,25 +45,34 @@ fun ResultsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    stringResource(R.string.congratulations, state.configuration?.player.orEmpty()),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Spacer(Modifier.height(30.dp))
-                AssetImage("images/logo.png", Modifier.size(150.dp))
-                Spacer(Modifier.height(20.dp))
-                Text(stringResource(R.string.completed_questions))
-                Spacer(Modifier.height(30.dp))
-                Button(
-                    onClick = onHome,
-                    //modifier = Modifier.fillMaxWidth()
+                AppSurface(
+                    modifier = Modifier
+                        .widthIn(max = 760.dp)
+                        .fillMaxWidth()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Home, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.back_home))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.congratulations, state.configuration?.player.orEmpty()),
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        AssetImage("images/logo.png", Modifier.size(130.dp))
+                        Text(stringResource(R.string.completed_questions))
+                        Button(onClick = onHome) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Home, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.back_home))
+                            }
+                        }
                     }
                 }
             }

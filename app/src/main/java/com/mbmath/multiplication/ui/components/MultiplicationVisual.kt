@@ -41,7 +41,6 @@ private val TYPE_A_ROW_COLORS = listOf(
 
 @Composable
 fun MultiplicationVisual(
-    isBase: Boolean,
     type: String,
     firstFactor: Int,
     secondFactor: Int,
@@ -85,7 +84,7 @@ fun MultiplicationVisual(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 //.padding(4.dp)
-                .padding(start = 10.dp, top=5.dp)
+                .padding(start = 10.dp, top=4.dp)
         )
 
         Column(

@@ -32,8 +32,8 @@
     <string name="play_again">もう一度プレイ</string>
     <string name="credits">クレジット</string>
     <string name="home">ホーム</string>
-    <string name="designed_by">デザイン：Daniela Alejandra Olivares Diaz</string>
-    <string name="implemented_by">実装：Mario Bernardo Bustamante Aguilar</string>
-    <string name="idea_by">アイデア：Adriana Margot Mundaca Bugueño</string>
+    <string name="designed_by">デザイン：Daniela Olivares Diaz</string>
+    <string name="implemented_by">実装：Mario Bustamante Aguilar</string>
+    <string name="idea_by">アイデア：Adriana Mundaca Bugueño</string>
     <string name="select_language">言語を選択</string>
 </resources>

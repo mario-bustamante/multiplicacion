@@ -194,7 +194,7 @@ fun AppScaffold(
                             Modifier
                         }
                     )
-                    .padding(20.dp)
+                    .padding(10.dp)
             ) {
                 content(paddingValues)
             }

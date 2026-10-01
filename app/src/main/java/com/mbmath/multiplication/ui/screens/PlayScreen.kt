@@ -68,6 +68,7 @@ import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
+import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.ui.components.localizedTitle
 import com.mbmath.multiplication.R
 import com.mbmath.multiplication.game.GameFeedback
@@ -114,114 +115,107 @@ fun PlayScreen(
                     .fillMaxSize()
                     .padding(innerPadding)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.question_progress, state.questionIndex + 1), fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.weight(1f))
-                    Text(stringResource(R.string.stage, state.stage))
-                }
-                LinearProgressIndicator(
-                    progress = { state.progress },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(12.dp))
-
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .then(
-                            if (isLandscape) {
-                                Modifier.fillMaxSize()
-                            } else {
-                                Modifier.fillMaxWidth()
-                            }
-                        )
-                        //.clip(RoundedCornerShape(10.dp))
-                        //.border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
-                        //.padding(10.dp)
-                ) {
-                    val imageMaxHeight = maxHeight * 0.65f
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                AppSurface(modifier = Modifier.fillMaxSize()) {
+                    Column(
                         modifier = Modifier
-                            .then(
-                                if (isLandscape) {
-                                    Modifier.fillMaxSize()
-                                } else {
-                                    Modifier.fillMaxWidth()
-                                }
-                            )
+                            .fillMaxSize()
+                            .padding(15.dp)
                     ) {
-                        TextButton(
-                            onClick = { },
-                            enabled = false,
-                            shape = RectangleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            MultiplicationVisual(
-                                isBase = true,
-                                type = if (configuration.gameMode == GameMode.FIND_RESULT) "a" else "b",
-                                firstFactor = question.factor2[question.correctOptionIndex],
-                                secondFactor = question.factor1[question.correctOptionIndex],
-                                modifier = if (isLandscape) {
-                                    Modifier.fillMaxHeight()
-                                } else {
-                                    Modifier.fillMaxWidth().heightIn(max = imageMaxHeight)
-                                }
-                            )
+                            Text(stringResource(R.string.question_progress, state.questionIndex + 1), fontWeight = FontWeight.Bold)
+                            Spacer(Modifier.weight(1f))
+                            Text(stringResource(R.string.stage, state.stage))
                         }
+                        LinearProgressIndicator(
+                            progress = { state.progress },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(Modifier.height(12.dp))
 
-                        question.factor1.indices.forEach { optionIndex ->
-                            val optionText = if (configuration.gameMode == GameMode.FIND_MULTIPLICATION) {
-                                "${question.factor1[optionIndex]} × ${question.factor2[optionIndex]}"
-                            } else {
-                                question.results[optionIndex].toString()
-                            }
-                            TextButton(
-                                onClick = { submitAnswer(optionIndex) },
-                                enabled = optionIndex !in state.disabledOptions && state.selectedOptionIndex == null,
-                                shape = RectangleShape,
-                                contentPadding = PaddingValues(0.dp),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth()
-                                    .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
-                            ) {
-                                MultiplicationVisual(
-                                    isBase = false,
-                                    type = if (configuration.gameMode == GameMode.FIND_RESULT) "b" else "a",
-                                    firstFactor = question.factor2[optionIndex],
-                                    secondFactor = question.factor1[optionIndex],
-                                    modifier = if (isLandscape) {
-                                        Modifier.fillMaxHeight()
+                        BoxWithConstraints(
+                            modifier = Modifier
+                                .then(
+                                    if (isLandscape) {
+                                        Modifier.fillMaxSize()
                                     } else {
-                                        Modifier.fillMaxWidth().heightIn(max = imageMaxHeight)
+                                        Modifier.fillMaxWidth()
                                     }
                                 )
+                        ) {
+                            val imageMaxHeight = maxHeight * 0.65f
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                                modifier = Modifier
+                                    .then(
+                                        if (isLandscape) {
+                                            Modifier.fillMaxSize()
+                                        } else {
+                                            Modifier.fillMaxWidth()
+                                        }
+                                    )
+                            ) {
+                                TextButton(
+                                    onClick = { },
+                                    enabled = false,
+                                    shape = RectangleShape,
+                                    contentPadding = PaddingValues(0.dp),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth()
+                                        .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
+                                ) {
+                                    MultiplicationVisual(
+                                        type = if (configuration.gameMode == GameMode.FIND_RESULT) "a" else "b",
+                                        firstFactor = question.factor2[question.correctOptionIndex],
+                                        secondFactor = question.factor1[question.correctOptionIndex],
+                                        modifier = if (isLandscape) {
+                                            Modifier.fillMaxHeight()
+                                        } else {
+                                            Modifier.fillMaxWidth().heightIn(max = imageMaxHeight)
+                                        }
+                                    )
+                                }
+
+                                question.factor1.indices.forEach { optionIndex ->
+                                    TextButton(
+                                        onClick = { submitAnswer(optionIndex) },
+                                        enabled = optionIndex !in state.disabledOptions && state.selectedOptionIndex == null,
+                                        shape = RectangleShape,
+                                        contentPadding = PaddingValues(0.dp),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxWidth()
+                                            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
+                                    ) {
+                                        MultiplicationVisual(
+                                            type = if (configuration.gameMode == GameMode.FIND_RESULT) "b" else "a",
+                                            firstFactor = question.factor2[optionIndex],
+                                            secondFactor = question.factor1[optionIndex],
+                                            modifier = if (isLandscape) {
+                                                Modifier.fillMaxHeight()
+                                            } else {
+                                                Modifier.fillMaxWidth().heightIn(max = imageMaxHeight)
+                                            }
+                                        )
+                                    }
+                                }
                             }
+                        }
+
+                        if (!isLandscape) {
+                            Spacer(Modifier.height(12.dp))
+                            AppScore(
+                                questions = state.questions,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(10.dp)
+                            )
                         }
                     }
                 }
-
-              //  if (!isLandscape) {
-                    Spacer(Modifier.height(12.dp))
-                    if (!isLandscape) {
-                        AppScore(
-                            questions = state.questions,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(10.dp))
-                                .border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
-                                .background(Color.White.copy(alpha = 0.5f))
-                                .padding(10.dp)
-                        )
-                    }
-               // }
             }
         }
     )
@@ -241,9 +235,9 @@ fun PlayScreenPreview() {
             ),
             questions = listOf(
                 Question(
-                    factor1 = intArrayOf(1, 1, 9),
+                    factor1 = intArrayOf(9, 1, 9),
                     factor2 = intArrayOf(9, 1, 9),
-                    results = intArrayOf(9, 2, 81),
+                    results = intArrayOf(81, 2, 81),
                     correctOptionIndex = 0,
                     selectedOption = 0
                 ),

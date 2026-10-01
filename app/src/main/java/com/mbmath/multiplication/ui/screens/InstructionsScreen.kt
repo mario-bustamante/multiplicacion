@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
@@ -37,6 +38,7 @@ import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
+import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.ui.components.AssetImage
 import com.mbmath.multiplication.ui.components.localizedTitle
 import com.mbmath.multiplication.R
@@ -58,34 +60,43 @@ fun InstructionsScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                //verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center
             ) {
-                AssetImage("images/logo.png", Modifier.size(150.dp))
-                Spacer(Modifier.height(20.dp))
-                Text(
-                    stringResource(
-                        R.string.instructions_selected,
-                        configuration.player.replaceFirstChar { it.uppercase() },
-                        configuration.gameMode.localizedTitle(),
-                        configuration.difficulty.localizedTitle()
-                    ),
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    stringResource(R.string.instructions_body),
-                    textAlign = TextAlign.Center
-                )
-                Spacer(Modifier.height(15.dp))
-
-                Button(
-                    onClick = onPlay,
-                    //modifier = Modifier.fillMaxWidth()
+                AppSurface(
+                    modifier = Modifier
+                        .widthIn(max = 760.dp)
+                        .fillMaxWidth()
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.play))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        AssetImage("images/logo.png", Modifier.size(130.dp))
+                        Text(
+                            stringResource(
+                                R.string.instructions_selected,
+                                configuration.player.replaceFirstChar { it.uppercase() },
+                                configuration.gameMode.localizedTitle(),
+                                configuration.difficulty.localizedTitle()
+                            ),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            stringResource(R.string.instructions_body),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Button(onClick = onPlay) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.PlayArrow, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.play))
+                            }
+                        }
                     }
                 }
             }
