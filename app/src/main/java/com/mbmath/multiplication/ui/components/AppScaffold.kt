@@ -1,5 +1,6 @@
 package com.mbmath.multiplication.ui.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,18 +29,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
 import androidx.core.os.LocaleListCompat
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.R
 import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.tooling.preview.Preview
+import com.mbmath.multiplication.ui.screens.HomeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -158,16 +167,48 @@ fun AppScaffold(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .then(
-                    if (verticalScrollEnabled) {
-                        Modifier.verticalScroll(rememberScrollState())
-                    } else {
-                        Modifier
+              //
+        ) {
+            AssetImage(
+                path = "images/background.png",
+                modifier = Modifier
+                    .fillMaxSize()
+                    //.blur(0.5.dp)
+                    //.background(Color.White.copy(alpha = 1f))
+                ,
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
+                colorFilter = ColorFilter.colorMatrix(
+                    ColorMatrix().apply {
+                        setToScale(2f, 2f, 2.5f, 1f)
                     }
                 )
-                .padding(20.dp)
-        ) {
-            content(paddingValues)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (verticalScrollEnabled) {
+                            Modifier.verticalScroll(rememberScrollState())
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .padding(20.dp)
+            ) {
+                content(paddingValues)
+            }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun AppScaffoldPreview() {
+    HomeScreen(
+        showInstructions = {},
+        onCredits  = {}
+    )
 }

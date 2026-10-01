@@ -2,6 +2,7 @@ package com.mbmath.multiplication.ui.screens
 
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,11 +68,11 @@ import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
-import com.mbmath.multiplication.ui.components.AssetImage
 import com.mbmath.multiplication.ui.components.localizedTitle
 import com.mbmath.multiplication.R
 import com.mbmath.multiplication.game.GameFeedback
 import com.mbmath.multiplication.ui.components.AppScore
+import com.mbmath.multiplication.ui.components.MultiplicationVisual
 
 @Composable
 fun PlayScreen(
@@ -162,16 +163,16 @@ fun PlayScreen(
                                 .fillMaxWidth()
                                 .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
                         ) {
-                            AssetImage(
-                                path = "images/${question.factor2[question.correctOptionIndex]}x${question.factor1[question.correctOptionIndex]}" +
-                                    if (configuration.gameMode == GameMode.FIND_RESULT) "a.gif" else "b.gif",
+                            MultiplicationVisual(
+                                isBase = true,
+                                type = if (configuration.gameMode == GameMode.FIND_RESULT) "a" else "b",
+                                firstFactor = question.factor2[question.correctOptionIndex],
+                                secondFactor = question.factor1[question.correctOptionIndex],
                                 modifier = if (isLandscape) {
                                     Modifier.fillMaxHeight()
                                 } else {
                                     Modifier.fillMaxWidth().heightIn(max = imageMaxHeight)
-                                },
-                                maintainAspectRatio = true,
-                                matchHeightConstraintsFirst = isLandscape
+                                }
                             )
                         }
 
@@ -191,16 +192,16 @@ fun PlayScreen(
                                     .fillMaxWidth()
                                     .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
                             ) {
-                                AssetImage(
-                                        path = "images/${question.factor2[optionIndex]}x${question.factor1[optionIndex]}" +
-                                            if (configuration.gameMode == GameMode.FIND_RESULT) "b.gif" else "a.gif",
+                                MultiplicationVisual(
+                                    isBase = false,
+                                    type = if (configuration.gameMode == GameMode.FIND_RESULT) "b" else "a",
+                                    firstFactor = question.factor2[optionIndex],
+                                    secondFactor = question.factor1[optionIndex],
                                     modifier = if (isLandscape) {
                                         Modifier.fillMaxHeight()
                                     } else {
                                         Modifier.fillMaxWidth().heightIn(max = imageMaxHeight)
-                                    },
-                                    maintainAspectRatio = true,
-                                    matchHeightConstraintsFirst = isLandscape
+                                    }
                                 )
                             }
                         }
@@ -214,9 +215,9 @@ fun PlayScreen(
                             questions = state.questions,
                             modifier = Modifier
                                 .fillMaxSize()
-                                //.weight(1f)
                                 .clip(RoundedCornerShape(10.dp))
                                 .border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
+                                .background(Color.White.copy(alpha = 0.5f))
                                 .padding(10.dp)
                         )
                     }
@@ -240,23 +241,23 @@ fun PlayScreenPreview() {
             ),
             questions = listOf(
                 Question(
-                    factor1 = intArrayOf(2, 4, 5),
-                    factor2 = intArrayOf(3, 2, 2),
-                    results = intArrayOf(6, 8, 10),
+                    factor1 = intArrayOf(1, 1, 9),
+                    factor2 = intArrayOf(9, 1, 9),
+                    results = intArrayOf(9, 2, 81),
                     correctOptionIndex = 0,
                     selectedOption = 0
                 ),
                 Question(
-                    factor1 = intArrayOf(2, 4, 5),
+                    factor1 = intArrayOf(2, 2, 5),
                     factor2 = intArrayOf(3, 2, 2),
-                    results = intArrayOf(6, 8, 10),
+                    results = intArrayOf(6, 4, 10),
                     correctOptionIndex = 1,
                     selectedOption = 1
                 ),
                 Question(
-                    factor1 = intArrayOf(2, 4, 5),
-                    factor2 = intArrayOf(3, 2, 2),
-                    results = intArrayOf(6, 8, 10),
+                    factor1 = intArrayOf(2, 3, 5),
+                    factor2 = intArrayOf(3, 3, 2),
+                    results = intArrayOf(6, 9, 10),
                     correctOptionIndex = 0,
                     selectedOption = 0
                 ),

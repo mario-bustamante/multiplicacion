@@ -60,7 +60,7 @@ fun InstructionsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 //verticalArrangement = Arrangement.Center
             ) {
-                AssetImage("images/personaje.png", Modifier.size(150.dp))
+                AssetImage("images/logo.png", Modifier.size(150.dp))
                 Spacer(Modifier.height(20.dp))
                 Text(
                     stringResource(

@@ -36,7 +36,7 @@ fun CreditsScreen(onHome: () -> Unit) {
                     .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AssetImage("images/personaje.png", Modifier.size(150.dp))
+                AssetImage("images/logo.png", Modifier.size(150.dp))
                 Spacer(Modifier.height(30.dp))
                 Text(stringResource(R.string.designed_by))
                 Spacer(Modifier.height(10.dp))

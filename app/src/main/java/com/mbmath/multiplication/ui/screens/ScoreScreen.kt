@@ -1,5 +1,6 @@
 package com.mbmath.multiplication.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
@@ -59,6 +61,7 @@ fun ScoreScreen(
                         .weight(1f)
                         .clip(RoundedCornerShape(10.dp))
                         .border(1.dp, colorResource(R.color.black), RoundedCornerShape(10.dp))
+                        .background(Color.White.copy(alpha = 0.5f))
                         .padding(10.dp)
                 )
 

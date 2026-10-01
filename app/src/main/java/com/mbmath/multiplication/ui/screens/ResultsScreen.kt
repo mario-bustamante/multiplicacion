@@ -49,7 +49,7 @@ fun ResultsScreen(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Spacer(Modifier.height(30.dp))
-                AssetImage("images/personaje.png", Modifier.size(150.dp))
+                AssetImage("images/logo.png", Modifier.size(150.dp))
                 Spacer(Modifier.height(20.dp))
                 Text(stringResource(R.string.completed_questions))
                 Spacer(Modifier.height(30.dp))
