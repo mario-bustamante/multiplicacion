@@ -45,9 +45,11 @@ class GameViewModel : ViewModel() {
         currentGameDifficulty = configuration.difficulty
 
         val question = createQuestion(1)
+        val questionMode = createQuestionMode()
 
         _state.value = _state.value.copy(
             screen = Screens.Play,
+            currentQuestionMode = questionMode,
             questions = listOf(question),
             questionIndex = 0,
             stage = 1,
@@ -121,10 +123,12 @@ class GameViewModel : ViewModel() {
         do {
             nextQuestion = createQuestion(nextStage)
         } while (currentState.questions.any { hasSameFactorPairs(it, nextQuestion) })
+        val nextQuestionMode = createQuestionMode()
 
 
         _state.value = currentState.copy(
             questions = currentState.questions + nextQuestion,
+            currentQuestionMode = nextQuestionMode,
             questionIndex = currentState.questionIndex + 1,
             stage = nextStage,
             stageQuestionCount = nextStageQuestionCount,
@@ -156,6 +160,16 @@ class GameViewModel : ViewModel() {
             results = results,
             correctOptionIndex = Random.nextInt(0, 3)
         )
+    }
+
+    private fun createQuestionMode(): GameMode = when (currentGameMode) {
+        GameMode.FIND_RESULT -> GameMode.FIND_RESULT
+        GameMode.FIND_MULTIPLICATION -> GameMode.FIND_MULTIPLICATION
+        GameMode.MIXED -> if (Random.nextBoolean()) {
+            GameMode.FIND_RESULT
+        } else {
+            GameMode.FIND_MULTIPLICATION
+        }
     }
 
     private fun valuesForStage(stage: Int): Pair<Int, Int> {

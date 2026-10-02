@@ -15,6 +15,43 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class GameViewModelTest {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun mixedModeKeepsQuestionModeStableUntilNextQuestion(): Unit = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        try {
+            val viewModel = GameViewModel()
+            viewModel.showInstructions(
+                GameConfiguration("Ana", GameMode.MIXED, Difficulty.EASY)
+            )
+            viewModel.onPlay()
+
+            val firstQuestionMode = viewModel.state.value.currentQuestionMode
+            assertEquals(
+                true,
+                firstQuestionMode == GameMode.FIND_RESULT ||
+                    firstQuestionMode == GameMode.FIND_MULTIPLICATION
+            )
+
+            val question = requireNotNull(viewModel.state.value.currentQuestion)
+            viewModel.submitAnswer((question.correctOptionIndex + 1) % 3)
+            assertEquals(firstQuestionMode, viewModel.state.value.currentQuestionMode)
+
+            viewModel.submitAnswer(question.correctOptionIndex)
+            advanceTimeBy(1_000)
+            runCurrent()
+
+            val nextQuestionMode = viewModel.state.value.currentQuestionMode
+            assertEquals(
+                true,
+                nextQuestionMode == GameMode.FIND_RESULT ||
+                    nextQuestionMode == GameMode.FIND_MULTIPLICATION
+            )
+        } finally {
+            Dispatchers.resetMain()
+        }
+    }
+
     @Test
     fun incorrectAnswersDisableOptionsAndIncrementErrorCount(): Unit = runTest {
         val viewModel = GameViewModel()

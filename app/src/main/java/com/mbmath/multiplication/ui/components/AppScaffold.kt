@@ -193,7 +193,7 @@ fun AppScaffold(
                 alignment = Alignment.TopCenter,
                 colorFilter = ColorFilter.colorMatrix(
                     ColorMatrix().apply {
-                        setToScale(2f, 2f, 2.5f, 1f)
+                        setToScale(1.5f, 1.5f, 1.5f, 0.8f)
                     }
                 )
             )

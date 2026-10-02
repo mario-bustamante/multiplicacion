@@ -1,6 +1,7 @@
 package com.mbmath.multiplication.game
 
 import com.mbmath.multiplication.model.GameConfiguration
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
 
 sealed interface Screens {
@@ -20,6 +21,7 @@ sealed interface GameFeedback {
 data class GameState(
     val screen: Screens = Screens.Home,
     val configuration: GameConfiguration? = null,
+    val currentQuestionMode: GameMode = GameMode.FIND_RESULT,
     val questions: List<Question> = emptyList(),
     val questionIndex: Int = 0,
     val stage: Int = 1,

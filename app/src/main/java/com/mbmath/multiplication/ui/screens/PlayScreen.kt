@@ -54,6 +54,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -94,7 +95,15 @@ fun PlayScreen(
     val configuration = state.configuration ?: return
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     var visibleFeedback by remember { mutableStateOf<GameFeedback?>(null) }
-    var feedbackEvent by remember { mutableStateOf(0) }
+    var feedbackEvent by remember { mutableIntStateOf(0) }
+
+
+
+
+
+
+
+
 
     LaunchedEffect(state.feedback, state.currentQuestion?.errors, state.questionIndex) {
         state.feedback?.let { feedback ->
@@ -119,6 +128,8 @@ fun PlayScreen(
         )
         null -> ""
     }
+
+    val type = if (state.currentQuestionMode == GameMode.FIND_RESULT) "a" else "b"
 
     AppScaffold(
         title = configuration.gameMode.localizedTitle(),
@@ -184,7 +195,7 @@ fun PlayScreen(
                                         .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
                                 ) {
                                     MultiplicationVisual(
-                                        type = if (configuration.gameMode == GameMode.FIND_RESULT) "a" else "b",
+                                        type = if (type == "a") "a" else "b",
                                         firstFactor = question.factor2[question.correctOptionIndex],
                                         secondFactor = question.factor1[question.correctOptionIndex],
                                         modifier = if (isLandscape) {
@@ -218,7 +229,7 @@ fun PlayScreen(
                                             }
                                     ) {
                                         MultiplicationVisual(
-                                            type = if (configuration.gameMode == GameMode.FIND_RESULT) "b" else "a",
+                                            type = if (type == "a") "b" else "a",
                                             firstFactor = question.factor2[optionIndex],
                                             secondFactor = question.factor1[optionIndex],
                                             modifier = if (isLandscape) {

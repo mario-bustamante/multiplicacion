@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.R
+import com.mbmath.multiplication.model.GameMode
 
 private const val CARD_ASPECT_RATIO = 755f / 1060f
 private val TYPE_A_ROW_COLORS = listOf(
