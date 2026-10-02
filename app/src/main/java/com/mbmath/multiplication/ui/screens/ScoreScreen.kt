@@ -41,6 +41,7 @@ fun ScoreScreen(
     AppScaffold(
         title = stringResource(R.string.results),
         verticalScrollEnabled = false,
+        onBackPlay = backToPlay,
         content = { innerPadding ->
 
             Column(

@@ -1,7 +1,6 @@
 package com.mbmath.multiplication.ui.screens
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -62,7 +62,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
+import kotlinx.coroutines.delay
 import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.game.Screens
 import com.mbmath.multiplication.model.Difficulty
@@ -74,6 +79,7 @@ import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.ui.components.localizedTitle
 import com.mbmath.multiplication.R
 import com.mbmath.multiplication.game.GameFeedback
+import com.mbmath.multiplication.ui.components.AppIcon
 import com.mbmath.multiplication.ui.components.AppScore
 import com.mbmath.multiplication.ui.components.MultiplicationVisual
 
@@ -87,9 +93,23 @@ fun PlayScreen(
     val question = state.currentQuestion ?: return
     val configuration = state.configuration ?: return
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val context = LocalContext.current
+    var visibleFeedback by remember { mutableStateOf<GameFeedback?>(null) }
+    var feedbackEvent by remember { mutableStateOf(0) }
 
-    val feedbackText = when (val feedback = state.feedback) {
+    LaunchedEffect(state.feedback, state.currentQuestion?.errors, state.questionIndex) {
+        state.feedback?.let { feedback ->
+            visibleFeedback = feedback
+            feedbackEvent++
+        }
+    }
+
+    LaunchedEffect(feedbackEvent) {
+        if (feedbackEvent == 0) return@LaunchedEffect
+        delay(2000)
+        visibleFeedback = null
+    }
+
+    val feedbackText = when (val feedback = visibleFeedback) {
         GameFeedback.Incorrect -> stringResource(R.string.feedback_incorrect)
         is GameFeedback.Correct -> stringResource(
             R.string.feedback_correct,
@@ -98,12 +118,6 @@ fun PlayScreen(
             feedback.result
         )
         null -> ""
-    }
-
-    LaunchedEffect(feedbackText) {
-        if (feedbackText.isNotBlank()) {
-            Toast.makeText(context, feedbackText, Toast.LENGTH_SHORT).show()
-        }
     }
 
     AppScaffold(
@@ -232,6 +246,37 @@ fun PlayScreen(
             }
         }
     )
+
+    visibleFeedback?.let { feedback ->
+        val isCorrect = feedback is GameFeedback.Correct
+        Popup(
+            alignment = Alignment.TopCenter,
+            offset = with(LocalDensity.current) { IntOffset(0, 96.dp.roundToPx()) },
+            onDismissRequest = { visibleFeedback = null },
+            properties = PopupProperties(focusable = false)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color.White,
+                contentColor = Color.Black,
+                shadowElevation = 6.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+
+                    AppIcon(
+                        tint = colorResource(if (isCorrect) R.color.correct else R.color.incorrect),
+                        imageVector = if (isCorrect) Icons.Default.Check else Icons.Default.Close
+                    )
+                   // Spacer(Modifier.width(6.dp))
+                    Text(feedbackText)
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

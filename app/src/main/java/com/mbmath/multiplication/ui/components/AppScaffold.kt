@@ -30,7 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.core.os.LocaleListCompat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,6 +62,7 @@ fun AppScaffold(
     title: String = "",
     onHome: (() -> Unit)? = null,
     onCredits: (() -> Unit)? = null,
+    onBackPlay: (() -> Unit)? = null,
     showResults: (() -> Unit)? = null,
     showLanguageSelector: Boolean = false
 ) {
@@ -151,6 +155,15 @@ fun AppScaffold(
                             Icon(
                                 imageVector = Icons.Default.Home,
                                 contentDescription = stringResource(R.string.home),
+                                tint = Color.LightGray
+                            )
+                        }
+                    }
+                    onBackPlay?.let { onClick ->
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.play_again),
                                 tint = Color.LightGray
                             )
                         }
