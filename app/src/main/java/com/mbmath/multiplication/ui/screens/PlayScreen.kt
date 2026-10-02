@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -180,15 +182,26 @@ fun PlayScreen(
                                 }
 
                                 question.factor1.indices.forEach { optionIndex ->
+                                    val isOptionEnabled = optionIndex !in state.disabledOptions &&
+                                        state.selectedOptionIndex == null
                                     TextButton(
                                         onClick = { submitAnswer(optionIndex) },
-                                        enabled = optionIndex !in state.disabledOptions && state.selectedOptionIndex == null,
+                                        enabled = isOptionEnabled,
+                                        colors = ButtonDefaults.textButtonColors(
+                                            disabledContentColor = Color.White.copy(alpha = 0.2f)
+                                        ),
                                         shape = RectangleShape,
                                         contentPadding = PaddingValues(0.dp),
                                         modifier = Modifier
                                             .weight(1f)
                                             .fillMaxWidth()
                                             .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier)
+                                            .drawWithContent {
+                                                drawContent()
+                                                if (!isOptionEnabled) {
+                                                    drawRect(Color.White.copy(alpha = 0.2f))
+                                                }
+                                            }
                                     ) {
                                         MultiplicationVisual(
                                             type = if (configuration.gameMode == GameMode.FIND_RESULT) "b" else "a",

@@ -1,10 +1,12 @@
 package com.mbmath.multiplication.ui.components
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
@@ -13,6 +15,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
@@ -33,8 +36,18 @@ fun AppScore(
     val answeredQuestions = questions.mapIndexedNotNull { index, question ->
         question.takeIf { it.selectedOption != 0 }?.let { index to it }
     }
+    val listState = rememberLazyListState()
 
-    LazyColumn(modifier = modifier) {
+    LaunchedEffect(answeredQuestions.size) {
+        if (answeredQuestions.isNotEmpty()) {
+            listState.animateScrollToItem(answeredQuestions.lastIndex)
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = modifier
+    ) {
         items(answeredQuestions) { (index, question) ->
             val isCorrect = question.selectedOption == question.correctOptionIndex + 1
             val status = when {
@@ -54,11 +67,24 @@ fun AppScore(
                     modifier = Modifier.weight(1f),
                     color = if (isCorrect) colorResource(R.color.correct) else colorResource(R.color.incorrect)
                 )
-                Icon(
-                    imageVector = if (isCorrect) Icons.Default.Check else Icons.Default.Close,
-                    contentDescription = status,
-                    tint = if (isCorrect) colorResource(R.color.correct) else colorResource(R.color.incorrect)
-                )
+
+                Log.d("AppScore", "${question.errors}")
+
+                repeat(question.errors) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = status,
+                        tint = colorResource(R.color.incorrect)
+                    )
+                }
+
+                if (isCorrect) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = status,
+                        tint = colorResource(R.color.correct)
+                    )
+                }
             }
         }
     }
@@ -73,6 +99,7 @@ fun AppScorePreview() {
             factor1 = intArrayOf(2, 4, 5),
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(6, 8, 10),
+            errors = 1,
             correctOptionIndex = 0,
             selectedOption = 1
         ),
@@ -80,6 +107,7 @@ fun AppScorePreview() {
             factor1 = intArrayOf(9, 4, 5),
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(27, 8, 10),
+            errors = 2,
             correctOptionIndex = 0,
             selectedOption = 2
         )

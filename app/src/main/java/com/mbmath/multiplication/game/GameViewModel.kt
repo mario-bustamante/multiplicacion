@@ -1,7 +1,9 @@
 package com.mbmath.multiplication.game
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mbmath.multiplication.model.Difficulty
 import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.model.Question
@@ -17,6 +19,7 @@ class GameViewModel : ViewModel() {
     val state: StateFlow<GameState> = _state.asStateFlow()
 
     private var currentGameMode = GameMode.FIND_RESULT
+    private var currentGameDifficulty = Difficulty.EASY
 
     fun onCredits() {
         _state.value = _state.value.copy(screen = Screens.Credits)
@@ -27,7 +30,6 @@ class GameViewModel : ViewModel() {
     }
 
     fun showInstructions(configuration: GameConfiguration) {
-        currentGameMode = configuration.gameMode
         _state.value = _state.value.copy(
             screen = Screens.Instructions(configuration),
             configuration = configuration
@@ -35,9 +37,15 @@ class GameViewModel : ViewModel() {
     }
 
     fun onPlay() {
+
+
+
         val configuration = _state.value.configuration ?: return
         currentGameMode = configuration.gameMode
+        currentGameDifficulty = configuration.difficulty
+
         val question = createQuestion(1)
+
         _state.value = _state.value.copy(
             screen = Screens.Play,
             questions = listOf(question),
@@ -57,9 +65,12 @@ class GameViewModel : ViewModel() {
 
         val isCorrect = optionIndex == question.correctOptionIndex
         val updatedQuestions = currentState.questions.toMutableList()
-        updatedQuestions[currentState.questionIndex] = question.selectOption(optionIndex)
+        val updatedQuestion = question.selectOption(optionIndex)
 
         if (!isCorrect) {
+            updatedQuestions[currentState.questionIndex] = updatedQuestion.copy(
+                errors = question.errors + 1
+            )
             _state.value = currentState.copy(
                 questions = updatedQuestions,
                 feedback = GameFeedback.Incorrect,
@@ -68,6 +79,7 @@ class GameViewModel : ViewModel() {
             return
         }
 
+        updatedQuestions[currentState.questionIndex] = updatedQuestion
         val result = question.results[question.correctOptionIndex]
         _state.value = currentState.copy(
             questions = updatedQuestions,
@@ -105,7 +117,12 @@ class GameViewModel : ViewModel() {
 
         val nextStageQuestionCount = if (currentState.stageQuestionCount == 3) 1 else currentState.stageQuestionCount + 1
         val nextStage = if (currentState.stageQuestionCount == 3) currentState.stage + 1 else currentState.stage
-        val nextQuestion = createQuestion(nextStage)
+        var nextQuestion: Question
+        do {
+            nextQuestion = createQuestion(nextStage)
+        } while (currentState.questions.any { hasSameFactorPairs(it, nextQuestion) })
+
+
         _state.value = currentState.copy(
             questions = currentState.questions + nextQuestion,
             questionIndex = currentState.questionIndex + 1,
@@ -117,8 +134,17 @@ class GameViewModel : ViewModel() {
         )
     }
 
+    // Returns true when both questions have the same correct ordered factor pair.
+    private fun hasSameFactorPairs(first: Question, second: Question): Boolean {
+        val firstCorrectIndex = first.correctOptionIndex
+        val secondCorrectIndex = second.correctOptionIndex
+        return first.factor1[firstCorrectIndex] == second.factor1[secondCorrectIndex] &&
+            first.factor2[firstCorrectIndex] == second.factor2[secondCorrectIndex]
+    }
+
     private fun createQuestion(stage: Int): Question {
         val factorPairs = mutableListOf<Pair<Int, Int>>()
+        // Keep the three ordered factor pairs unique within this question.
         while (factorPairs.size < 3) {
             val factorPair = valuesForStage(stage)
             if (factorPair !in factorPairs) factorPairs += factorPair
@@ -133,16 +159,37 @@ class GameViewModel : ViewModel() {
     }
 
     private fun valuesForStage(stage: Int): Pair<Int, Int> {
-        val factor1 = when (stage) {
-            1 -> 1
-            2 -> Random.nextInt(2, 4)
-            3 -> Random.nextInt(4, 6)
-            4 -> 6
-            5 -> 7
-            6 -> 8
-            7 -> 9
-            else -> Random.nextInt(1, 10)
+        val difficulty: Int = if(currentGameDifficulty == Difficulty.ADVANCED) {
+            3
+        } else if(currentGameDifficulty == Difficulty.INTERMEDIATE) {
+            2
+        } else {
+            1
         }
-        return factor1 to Random.nextInt(1, 10)
+        var factor1 = when (stage) {
+            1 -> Random.nextInt(difficulty, 1 + difficulty)
+            2 -> Random.nextInt(difficulty, 1 + difficulty)
+            3 -> Random.nextInt(1 + difficulty, 2 + difficulty)
+            4 -> Random.nextInt(1 + difficulty, 2 + difficulty)
+            5 -> Random.nextInt(1 + difficulty, 2 + difficulty)
+            6 -> Random.nextInt(1 + difficulty, 3 + difficulty)
+            7 -> Random.nextInt(2 + difficulty, 3 + difficulty)
+            8 -> Random.nextInt(2 + difficulty, 3 + difficulty)
+            9 -> Random.nextInt(2 + difficulty, 4 + difficulty)
+            10 -> Random.nextInt(2 + difficulty, 4 + difficulty)
+            11 -> Random.nextInt(2 + difficulty, 5 + difficulty)
+            12 -> Random.nextInt(2 + difficulty, 5 + difficulty)
+            else -> Random.nextInt(2 + difficulty, 7 + difficulty)
+        }
+
+        var factor2 = Random.nextInt(1, 10)
+
+        val factor3 = factor1
+        if (Random.nextBoolean()) {
+            factor1 = factor2
+            factor2 = factor3
+        }
+
+        return factor1 to factor2
     }
 }
