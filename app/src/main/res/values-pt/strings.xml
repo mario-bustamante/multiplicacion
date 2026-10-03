@@ -13,7 +13,8 @@
     <string name="difficulty_advanced">Avançado</string>
     <string name="instructions_title">Instruções</string>
     <string name="instructions_selected">%1$s, você selecionou %2$s com dificuldade %3$s.</string>
-    <string name="instructions_body">Observe as cartas e selecione a resposta correspondente.</string>
+    <string name="instructions_find_result">Observe a multiplicação na primeira carta e selecione a carta que mostra o resultado.</string>
+    <string name="instructions_find_multiplication">Observe o resultado na primeira carta e selecione a carta com a multiplicação correspondente.</string>
     <string name="play">Jogar</string>
     <string name="question_progress">Pergunta %1$d de 24</string>
     <string name="stage">Etapa %1$d</string>

@@ -12,7 +12,8 @@
     <string name="difficulty_advanced">Advanced</string>
     <string name="instructions_title">Instructions</string>
     <string name="instructions_selected">%1$s, you selected %2$s at %3$s difficulty.</string>
-    <string name="instructions_body">Look at the cards and select the matching answer.</string>
+    <string name="instructions_find_result">Look at the multiplication on the first card and select the card that shows its result.</string>
+    <string name="instructions_find_multiplication">Look at the result on the first card and select the card with the corresponding multiplication.</string>
     <string name="play">Play</string>
     <string name="question_progress">Question %1$d of 24</string>
     <string name="stage">Stage %1$d</string>

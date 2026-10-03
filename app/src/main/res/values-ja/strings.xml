@@ -13,7 +13,8 @@
     <string name="difficulty_advanced">むずかしい</string>
     <string name="instructions_title">遊び方</string>
     <string name="instructions_selected">%1$sさん、%2$s（難易度：%3$s）を選びました。</string>
-    <string name="instructions_body">カードを見て、正しい答えを選んでください。</string>
+    <string name="instructions_find_result">最初のカードのかけ算を見て、その答えが書かれたカードを選んでください。</string>
+    <string name="instructions_find_multiplication">最初のカードの答えを見て、それに対応するかけ算のカードを選んでください。</string>
     <string name="play">プレイ</string>
     <string name="question_progress">問題 %1$d / 24</string>
     <string name="stage">ステージ %1$d</string>

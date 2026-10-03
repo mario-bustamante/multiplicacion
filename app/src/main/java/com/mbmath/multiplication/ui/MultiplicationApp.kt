@@ -37,7 +37,6 @@ fun MultiplicationApp(viewModel: GameViewModel) {
             configuration = screen.configuration,
             onPlay = viewModel::onPlay,
             onHome = viewModel::onHome,
-            onCredits = viewModel::onCredits,
         )
         Screens.Play -> PlayScreen(
             state = state,
