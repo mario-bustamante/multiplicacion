@@ -13,8 +13,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mbmath.multiplication.game.GameState
 import com.mbmath.multiplication.game.GameViewModel
 import com.mbmath.multiplication.game.Screens
+import com.mbmath.multiplication.model.Difficulty
+import com.mbmath.multiplication.model.GameConfiguration
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.ui.screens.CreditsScreen
 import com.mbmath.multiplication.ui.screens.HomeScreen
 import com.mbmath.multiplication.ui.screens.InstructionsScreen
@@ -30,19 +34,24 @@ fun MultiplicationApp(viewModel: GameViewModel) {
 
     when (val screen = state.screen) {
         Screens.Home -> HomeScreen(
+            state = state,
             showInstructions = viewModel::showInstructions,
-            onCredits  = viewModel::onCredits
+            showCredits  = viewModel::showCredits,
+            onPlay = viewModel::onPlay,
+            onConfigurationChange = viewModel::updateConfiguration
         )
         is Screens.Instructions -> InstructionsScreen(
             configuration = screen.configuration,
             onPlay = viewModel::onPlay,
             onHome = viewModel::onHome,
+            backToPlay = viewModel::backToPlay
         )
         Screens.Play -> PlayScreen(
             state = state,
+            showInstructions = viewModel::showInstructions,
             submitAnswer = viewModel::submitAnswer,
             showResults = viewModel::showResults,
-            onHome = viewModel::onHome
+            onHome = viewModel::onHome,
         )
         Screens.Score -> ScoreScreen(
             questions = state.questions,
@@ -62,7 +71,16 @@ fun MultiplicationApp(viewModel: GameViewModel) {
 @Composable
 fun MultiplicationAppPreview() {
     HomeScreen(
+        state = GameState(
+            screen = Screens.Play,
+            configuration = GameConfiguration(
+                player = "Ana",
+                gameMode = GameMode.MIXED,
+                difficulty = Difficulty.INTERMEDIATE
+            )
+        ),
         showInstructions = {},
-        onCredits  = {},
+        showCredits  = {},
+        onPlay = {}
     )
 }

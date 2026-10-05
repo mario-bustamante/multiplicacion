@@ -11,9 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.R
@@ -38,12 +42,13 @@ import com.mbmath.multiplication.ui.components.localizedTitle
 fun InstructionsScreen(
     configuration: GameConfiguration,
     onPlay: () -> Unit,
-    onHome: () -> Unit
+    onHome: () -> Unit,
+    backToPlay: () -> Unit
 ) {
     AppScaffold(
         title = stringResource(R.string.instructions_title),
         onHome = onHome,
-        onPlay = onPlay,
+        onPlay = if(configuration.wasLoggedIn) null else onPlay,
         content = { innerPadding ->
             BoxWithConstraints(
                 modifier = Modifier
@@ -133,14 +138,37 @@ fun InstructionsScreen(
                         }
                     }
 
-                    Button(
-                        onClick = onPlay,
-                        modifier = if (isWideLayout) Modifier.widthIn(min = 220.dp) else Modifier.fillMaxWidth()
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.PlayArrow, contentDescription = null)
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(R.string.play))
+                    if(configuration.wasLoggedIn) {
+                        Button(
+                            onClick = backToPlay,
+                            border = BorderStroke(1.dp, colorResource(R.color.white)),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorResource(R.color.button_primary),
+                                contentColor = colorResource(R.color.white)
+                            ),
+                            modifier = if (isWideLayout) Modifier.widthIn(min = 220.dp) else Modifier.fillMaxWidth()
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.play_again))
+                            }
+                        }
+                    } else {
+                        Button(
+                            onClick = onPlay,
+                            border = BorderStroke(1.dp, colorResource(R.color.white)),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorResource(R.color.button_primary),
+                                contentColor = colorResource(R.color.white)
+                            ),
+                            modifier = if (isWideLayout) Modifier.widthIn(min = 220.dp) else Modifier.fillMaxWidth()
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.PlayArrow, contentDescription = null)
+                                Spacer(Modifier.width(8.dp))
+                                Text(stringResource(R.string.play))
+                            }
                         }
                     }
                 }
@@ -189,9 +217,11 @@ fun InstructionsScreenPreview() {
         configuration = GameConfiguration(
                 player = "Ana",
                 gameMode = GameMode.FIND_RESULT,
-                difficulty = Difficulty.EASY
+                difficulty = Difficulty.EASY,
+                wasLoggedIn = false
             ),
         onPlay = {},
         onHome = {},
+        backToPlay = {}
     )
 }

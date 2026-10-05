@@ -21,12 +21,23 @@ class GameViewModel : ViewModel() {
     private var currentGameMode = GameMode.FIND_RESULT
     private var currentGameDifficulty = Difficulty.EASY
 
-    fun onCredits() {
+    fun showCredits() {
         _state.value = _state.value.copy(screen = Screens.Credits)
     }
 
     fun onHome() {
-        _state.value = GameState()
+        _state.value.configuration?.let { configuration ->
+            currentGameMode = configuration.gameMode
+            currentGameDifficulty = configuration.difficulty
+        }
+
+        _state.value = _state.value.copy(
+            screen = Screens.Home,
+        )
+    }
+
+    fun updateConfiguration(configuration: GameConfiguration) {
+        _state.value = _state.value.copy(configuration = configuration)
     }
 
     fun showInstructions(configuration: GameConfiguration) {
@@ -37,10 +48,9 @@ class GameViewModel : ViewModel() {
     }
 
     fun onPlay() {
-
-
-
         val configuration = _state.value.configuration ?: return
+        
+        configuration.wasLoggedIn = true
         currentGameMode = configuration.gameMode
         currentGameDifficulty = configuration.difficulty
 

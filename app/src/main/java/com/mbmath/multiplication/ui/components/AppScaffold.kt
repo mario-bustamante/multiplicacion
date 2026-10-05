@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -34,7 +33,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.core.os.LocaleListCompat
 import androidx.compose.ui.Alignment
@@ -53,6 +55,11 @@ import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.R
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.tooling.preview.Preview
+import com.mbmath.multiplication.game.GameState
+import com.mbmath.multiplication.game.Screens
+import com.mbmath.multiplication.model.Difficulty
+import com.mbmath.multiplication.model.GameConfiguration
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.ui.screens.HomeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,10 +70,11 @@ fun AppScaffold(
     verticalScrollEnabled: Boolean = true,
     title: String = "",
     onHome: (() -> Unit)? = null,
-    onCredits: (() -> Unit)? = null,
+    showCredits: (() -> Unit)? = null,
     onPlay: (() -> Unit)? = null,
     onBackPlay: (() -> Unit)? = null,
     showResults: (() -> Unit)? = null,
+    showInstructions: (() -> Unit)? = null,
     showLanguageSelector: Boolean = false
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -133,7 +141,7 @@ fun AppScaffold(
                             }
                         }
                     }
-                    onCredits?.let { onClick ->
+                    showCredits?.let { onClick ->
                         IconButton(onClick = onClick) {
                             Icon(
                                 imageVector = Icons.Default.Info,
@@ -142,11 +150,20 @@ fun AppScaffold(
                             )
                         }
                     }
+                    showInstructions?.let { onClick ->
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.Default.Help,
+                                contentDescription = stringResource(R.string.instructions_title),
+                                tint = Color.LightGray
+                            )
+                        }
+                    }
                     showResults?.let { onClick ->
                         IconButton(onClick = onClick) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
-                                contentDescription = stringResource(R.string.credits),
+                                contentDescription = stringResource(R.string.results),
                                 tint = Color.LightGray
                             )
                         }
@@ -233,7 +250,16 @@ fun AppScaffold(
 @Composable
 fun AppScaffoldPreview() {
     HomeScreen(
+        state = GameState(
+            screen = Screens.Play,
+            configuration = GameConfiguration(
+                player = "Ana",
+                gameMode = GameMode.FIND_RESULT,
+                difficulty = Difficulty.ADVANCED
+            )
+        ),
         showInstructions = {},
-        onCredits  = {}
+        showCredits  = {},
+        onPlay = {}
     )
 }

@@ -1,6 +1,7 @@
 package com.mbmath.multiplication.ui.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -28,10 +29,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
@@ -46,6 +43,8 @@ import com.mbmath.multiplication.model.GameMode
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.ui.components.AppScaffold
@@ -53,19 +52,28 @@ import com.mbmath.multiplication.ui.components.AppSelector
 import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.ui.components.localizedTitle
 import com.mbmath.multiplication.R
+import com.mbmath.multiplication.game.GameState
+import com.mbmath.multiplication.game.Screens
+import com.mbmath.multiplication.model.Question
+import com.mbmath.multiplication.ui.components.AppButton
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HomeScreen(
+    state: GameState,
     showInstructions: (GameConfiguration) -> Unit,
-    onCredits : () -> Unit,
+    showCredits : () -> Unit,
+    onPlay: () -> Unit,
+    onConfigurationChange: (GameConfiguration) -> Unit = {},
 ) {
-    var player by remember { mutableStateOf("") }
-    var gameMode by remember { mutableStateOf(GameMode.FIND_RESULT) }
-    var difficulty by remember { mutableStateOf(Difficulty.EASY) }
+    val configuration = state.configuration ?: GameConfiguration(
+        player = "",
+        gameMode = GameMode.FIND_RESULT,
+        difficulty = Difficulty.EASY
+    )
 
     AppScaffold(
-        onCredits = onCredits,
+        showCredits = showCredits,
         showLanguageSelector = true,
         content = { innerPadding ->
             BoxWithConstraints(
@@ -87,8 +95,10 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(if (isWideLayout) 20.dp else 14.dp)
                     ) {
                         OutlinedTextField(
-                            value = player,
-                            onValueChange = { player = it },
+                            value = configuration.player,
+                            onValueChange = {
+                                onConfigurationChange(configuration.copy(player = it))
+                            },
                             label = { Text(stringResource(R.string.enter_name)) },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
@@ -104,25 +114,38 @@ fun HomeScreen(
                                 AppSelector(
                                     stringResource(R.string.game_mode),
                                     GameMode.entries,
-                                    gameMode,
-                                    { gameMode = it }
+                                    configuration.gameMode,
+                                    {
+                                        onConfigurationChange(configuration.copy(gameMode = it))
+                                    }
                                 ) { it.localizedTitle() }
                             }
                             Column(modifier = Modifier.weight(1f)) {
                                 AppSelector(
                                     stringResource(R.string.difficulty),
                                     Difficulty.entries,
-                                    difficulty,
-                                    { difficulty = it }
+                                    configuration.difficulty,
+                                    {
+                                        onConfigurationChange(configuration.copy(difficulty = it))
+                                    }
                                 ) { it.localizedTitle() }
                             }
                         }
 
                         Button(
                             onClick = {
-                                showInstructions(GameConfiguration(player.trim(), gameMode, difficulty))
+                                if (configuration.wasLoggedIn){
+                                    onPlay()
+                                } else {
+                                    showInstructions(configuration.copy(player = configuration.player.trim()))
+                                }
                             },
-                            enabled = player.isNotBlank(),
+                            enabled = configuration.player.isNotBlank(),
+                            border = BorderStroke(1.dp, colorResource(androidx.cardview.R.color.cardview_light_background)),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorResource(R.color.button_primary),
+                                contentColor = colorResource(R.color.white)
+                            ),
                             modifier = if (isWideLayout) {
                                 Modifier.widthIn(min = 200.dp)
                             } else {
@@ -151,7 +174,16 @@ fun HomeScreen(
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(
+        state = GameState(
+            screen = Screens.Play,
+            configuration = GameConfiguration(
+                player = "Ana",
+                gameMode = GameMode.FIND_RESULT,
+                difficulty = Difficulty.ADVANCED
+            )
+        ),
         showInstructions = {},
-        onCredits  = {}
+        showCredits  = {},
+        onPlay = {}
     )
 }

@@ -15,5 +15,6 @@ enum class Difficulty {
 data class GameConfiguration(
     val player: String,
     val gameMode: GameMode,
-    val difficulty: Difficulty
+    val difficulty: Difficulty,
+    var wasLoggedIn: Boolean = false
 )
