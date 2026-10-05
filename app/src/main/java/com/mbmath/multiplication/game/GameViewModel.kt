@@ -40,9 +40,9 @@ class GameViewModel : ViewModel() {
         _state.value = _state.value.copy(configuration = configuration)
     }
 
-    fun showInstructions(configuration: GameConfiguration) {
+    fun showHelp(configuration: GameConfiguration) {
         _state.value = _state.value.copy(
-            screen = Screens.Instructions(configuration),
+            screen = Screens.Help(configuration),
             configuration = configuration
         )
     }
@@ -183,12 +183,16 @@ class GameViewModel : ViewModel() {
     }
 
     private fun valuesForStage(stage: Int): Pair<Int, Int> {
-        val difficulty: Int = if(currentGameDifficulty == Difficulty.ADVANCED) {
-            3
-        } else if(currentGameDifficulty == Difficulty.INTERMEDIATE) {
-            2
-        } else {
-            1
+        val difficulty: Int = when (currentGameDifficulty) {
+            Difficulty.ADVANCED -> {
+                3
+            }
+            Difficulty.INTERMEDIATE -> {
+                2
+            }
+            else -> {
+                1
+            }
         }
         var factor1 = when (stage) {
             1 -> Random.nextInt(difficulty, 1 + difficulty)
@@ -206,7 +210,7 @@ class GameViewModel : ViewModel() {
             else -> Random.nextInt(2 + difficulty, 7 + difficulty)
         }
 
-        var factor2 = Random.nextInt(1, 10)
+        var factor2 = Random.nextInt(difficulty, 10)
 
         val factor3 = factor1
         if (Random.nextBoolean()) {

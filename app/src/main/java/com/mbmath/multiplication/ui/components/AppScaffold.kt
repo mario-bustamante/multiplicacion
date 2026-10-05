@@ -74,7 +74,7 @@ fun AppScaffold(
     onPlay: (() -> Unit)? = null,
     onBackPlay: (() -> Unit)? = null,
     showResults: (() -> Unit)? = null,
-    showInstructions: (() -> Unit)? = null,
+    showHelp: (() -> Unit)? = null,
     showLanguageSelector: Boolean = false
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -141,16 +141,7 @@ fun AppScaffold(
                             }
                         }
                     }
-                    showCredits?.let { onClick ->
-                        IconButton(onClick = onClick) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = stringResource(R.string.credits),
-                                tint = Color.LightGray
-                            )
-                        }
-                    }
-                    showInstructions?.let { onClick ->
+                    showHelp?.let { onClick ->
                         IconButton(onClick = onClick) {
                             Icon(
                                 imageVector = Icons.Default.Help,
@@ -173,6 +164,15 @@ fun AppScaffold(
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = stringResource(R.string.play),
+                                tint = Color.LightGray
+                            )
+                        }
+                    }
+                    showCredits?.let { onClick ->
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = stringResource(R.string.credits),
                                 tint = Color.LightGray
                             )
                         }
@@ -209,7 +209,6 @@ fun AppScaffold(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-              //
         ) {
             AssetImage(
                 path = "images/background.png",
@@ -258,7 +257,7 @@ fun AppScaffoldPreview() {
                 difficulty = Difficulty.ADVANCED
             )
         ),
-        showInstructions = {},
+        showHelp = {},
         showCredits  = {},
         onPlay = {}
     )

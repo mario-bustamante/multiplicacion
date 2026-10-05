@@ -89,7 +89,7 @@ fun PlayScreen(
     state: GameState,
     submitAnswer: (Int) -> Unit,
     showResults: () -> Unit,
-    showInstructions: (GameConfiguration) -> Unit,
+    showHelp: (GameConfiguration) -> Unit,
     onHome: () -> Unit
 ) {
     val question = state.currentQuestion ?: return
@@ -128,7 +128,7 @@ fun PlayScreen(
         title = configuration.gameMode.localizedTitle(),
         onHome = onHome,
         showResults = showResults,
-        showInstructions = { showInstructions(configuration) },
+        showHelp = { showHelp(configuration) },
         verticalScrollEnabled = false,
         content = { innerPadding ->
             Column(
@@ -322,7 +322,7 @@ fun PlayScreenPreview() {
         ),
         submitAnswer = {},
         showResults = {},
-        showInstructions = {},
+        showHelp = {},
         onHome = {}
     )
 }

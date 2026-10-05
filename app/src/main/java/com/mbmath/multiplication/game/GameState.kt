@@ -6,7 +6,7 @@ import com.mbmath.multiplication.model.Question
 
 sealed interface Screens {
     data object Home : Screens
-    data class Instructions(val configuration: GameConfiguration) : Screens
+    data class Help(val configuration: GameConfiguration) : Screens
     data object Play : Screens
     data object Score : Screens
     data object Results : Screens

@@ -1,6 +1,7 @@
 package com.mbmath.multiplication.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,6 @@ import com.mbmath.multiplication.model.GameConfiguration
 
 @Composable
 fun AppButton(
-    modifier: Modifier,
     onClick: () -> Unit,
     icon: ImageVector,
     textDescription: Int,
@@ -38,12 +38,15 @@ fun AppButton(
             containerColor = colorResource(R.color.button_primary),
             contentColor = colorResource(R.color.white)
         ),
-        modifier = modifier
-
+        modifier = Modifier.widthIn(min = 150.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier,
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Icon(icon, contentDescription = stringResource(textDescription))
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(5.dp))
             Text(stringResource(textDescription))
         }
     }

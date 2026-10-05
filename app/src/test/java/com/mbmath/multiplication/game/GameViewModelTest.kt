@@ -21,7 +21,7 @@ class GameViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
             val viewModel = GameViewModel()
-            viewModel.showInstructions(
+            viewModel.showHelp(
                 GameConfiguration("Ana", GameMode.MIXED, Difficulty.EASY)
             )
             viewModel.onPlay()
@@ -55,7 +55,7 @@ class GameViewModelTest {
     @Test
     fun incorrectAnswersDisableOptionsAndIncrementErrorCount(): Unit = runTest {
         val viewModel = GameViewModel()
-        viewModel.showInstructions(
+        viewModel.showHelp(
             GameConfiguration("Ana", GameMode.FIND_RESULT, Difficulty.EASY)
         )
         viewModel.onPlay()
@@ -86,7 +86,7 @@ class GameViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
             val viewModel = GameViewModel()
-            viewModel.showInstructions(
+            viewModel.showHelp(
                 GameConfiguration("Ana", GameMode.FIND_RESULT, Difficulty.EASY)
             )
             viewModel.onPlay()

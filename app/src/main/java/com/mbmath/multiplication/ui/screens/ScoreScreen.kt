@@ -34,6 +34,7 @@ import com.mbmath.multiplication.model.Question
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.R
+import com.mbmath.multiplication.ui.components.AppButton
 import com.mbmath.multiplication.ui.components.AppScore
 
 @Composable
@@ -66,22 +67,13 @@ fun ScoreScreen(
                     )
                 }
 
-                Spacer(Modifier.height(30.dp))
-                Button(
+                Spacer(Modifier.height(10.dp))
+
+                AppButton(
                     onClick = backToPlay,
-                    border = BorderStroke(1.dp, colorResource(R.color.white)),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(R.color.button_primary),
-                        contentColor = colorResource(R.color.white)
-                    ),
-                    //modifier = Modifier.fillMaxWidth()
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.play_again))
-                    }
-                }
+                    icon = Icons.AutoMirrored.Filled.ArrowBack,
+                    textDescription = R.string.play_again,
+                )
             }
         }
     )

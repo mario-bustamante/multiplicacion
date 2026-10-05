@@ -20,8 +20,8 @@ import com.mbmath.multiplication.model.Difficulty
 import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.ui.screens.CreditsScreen
+import com.mbmath.multiplication.ui.screens.HelpScreen
 import com.mbmath.multiplication.ui.screens.HomeScreen
-import com.mbmath.multiplication.ui.screens.InstructionsScreen
 import com.mbmath.multiplication.ui.screens.PlayScreen
 import com.mbmath.multiplication.ui.screens.ResultsScreen
 import com.mbmath.multiplication.ui.screens.ScoreScreen
@@ -35,12 +35,12 @@ fun MultiplicationApp(viewModel: GameViewModel) {
     when (val screen = state.screen) {
         Screens.Home -> HomeScreen(
             state = state,
-            showInstructions = viewModel::showInstructions,
+            showHelp = viewModel::showHelp,
             showCredits  = viewModel::showCredits,
             onPlay = viewModel::onPlay,
             onConfigurationChange = viewModel::updateConfiguration
         )
-        is Screens.Instructions -> InstructionsScreen(
+        is Screens.Help -> HelpScreen(
             configuration = screen.configuration,
             onPlay = viewModel::onPlay,
             onHome = viewModel::onHome,
@@ -48,7 +48,7 @@ fun MultiplicationApp(viewModel: GameViewModel) {
         )
         Screens.Play -> PlayScreen(
             state = state,
-            showInstructions = viewModel::showInstructions,
+            showHelp = viewModel::showHelp,
             submitAnswer = viewModel::submitAnswer,
             showResults = viewModel::showResults,
             onHome = viewModel::onHome,
@@ -79,7 +79,7 @@ fun MultiplicationAppPreview() {
                 difficulty = Difficulty.INTERMEDIATE
             )
         ),
-        showInstructions = {},
+        showHelp = {},
         showCredits  = {},
         onPlay = {}
     )

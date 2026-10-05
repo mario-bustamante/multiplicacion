@@ -61,7 +61,7 @@ import com.mbmath.multiplication.ui.components.AppButton
 @Composable
 fun HomeScreen(
     state: GameState,
-    showInstructions: (GameConfiguration) -> Unit,
+    showHelp: (GameConfiguration) -> Unit,
     showCredits : () -> Unit,
     onPlay: () -> Unit,
     onConfigurationChange: (GameConfiguration) -> Unit = {},
@@ -74,6 +74,7 @@ fun HomeScreen(
 
     AppScaffold(
         showCredits = showCredits,
+        showHelp = { showHelp(configuration) },
         showLanguageSelector = true,
         content = { innerPadding ->
             BoxWithConstraints(
@@ -81,7 +82,7 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
             ) {
-                val isWideLayout = maxWidth >= 600.dp
+                val isWideLayout = maxWidth >= 700.dp
 
                 AppSurface(
                     modifier = Modifier
@@ -132,32 +133,18 @@ fun HomeScreen(
                             }
                         }
 
-                        Button(
+                        AppButton(
                             onClick = {
                                 if (configuration.wasLoggedIn){
                                     onPlay()
                                 } else {
-                                    showInstructions(configuration.copy(player = configuration.player.trim()))
+                                    showHelp(configuration.copy(player = configuration.player.trim()))
                                 }
                             },
-                            enabled = configuration.player.isNotBlank(),
-                            border = BorderStroke(1.dp, colorResource(androidx.cardview.R.color.cardview_light_background)),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = colorResource(R.color.button_primary),
-                                contentColor = colorResource(R.color.white)
-                            ),
-                            modifier = if (isWideLayout) {
-                                Modifier.widthIn(min = 200.dp)
-                            } else {
-                                Modifier.fillMaxWidth()
-                            }
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.PlayArrow, contentDescription = null)
-                                Spacer(Modifier.width(8.dp))
-                                Text(stringResource(R.string.start))
-                            }
-                        }
+                            icon = Icons.Default.PlayArrow,
+                            textDescription = R.string.start,
+                            enabled = configuration.player.isNotBlank()
+                        )
                     }
                 }
             }
@@ -182,7 +169,7 @@ fun HomeScreenPreview() {
                 difficulty = Difficulty.ADVANCED
             )
         ),
-        showInstructions = {},
+        showHelp = {},
         showCredits  = {},
         onPlay = {}
     )
