@@ -18,8 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mbmath.multiplication.R
@@ -41,9 +41,9 @@ fun HelpScreen(
 ) {
     AppScaffold(
         title = stringResource(R.string.instructions_title),
-        onHome = if(configuration.wasLoggedIn) null else onHome,
-        onBackPlay = if(configuration.wasLoggedIn) backToPlay else null,
-        onPlay = if(configuration.wasLoggedIn || !configuration.player.isNotBlank()) null else onPlay,
+        onHome = if(!configuration.wasLoggedIn || !configuration.isPlaying) onHome else null, // false false
+        onPlay = if(!configuration.wasLoggedIn && configuration.isPlaying) onPlay else null, // true false
+        onBackPlay = if(configuration.wasLoggedIn && configuration.isPlaying) backToPlay else null, // true
         content = { innerPadding ->
             BoxWithConstraints(
                 modifier = Modifier
@@ -65,7 +65,7 @@ fun HelpScreen(
                 ) {
 
 
-                    if (configuration.player.isNotBlank()) {
+                    if (configuration.isPlaying) {
                         AppSurface(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier
@@ -139,7 +139,7 @@ fun HelpScreen(
                         }
                     }
 
-                    if(configuration.player.isNotBlank()) {
+                    if(configuration.isPlaying) {
                         if (configuration.wasLoggedIn) {
                             AppButton(
                                 onClick = backToPlay,

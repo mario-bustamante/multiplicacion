@@ -1,9 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-
-    id("com.google.devtools.ksp")
-    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -65,33 +62,11 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
 
-    //  navigation compose
-    implementation(libs.androidx.navigation.compose)
-
-    // dagger hilt - inyeccion de dependencias
-    implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.foundation)
-    ksp(libs.hilt.android.compiler)
-
-    // Retrofit core library
-    implementation(libs.retrofit)
-    // Converter library to automatically parse JSON into Kotlin objects
-    implementation(libs.converter.gson)
-    implementation(libs.gson)
-
-    // moshi
-    implementation(libs.moshi.kotlin)
-    ksp(libs.moshi.kotlin.codegen)
 
     // data store
     implementation(libs.androidx.datastore.preferences)
-
-    // async image
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
 
     // icons
     implementation(libs.androidx.compose.material.icons.extended)

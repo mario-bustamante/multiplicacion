@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.mbmath.multiplication.R
 import com.mbmath.multiplication.ui.components.AppScaffold
 import com.mbmath.multiplication.ui.components.AppSurface
 import com.mbmath.multiplication.ui.components.AssetImage
-import com.mbmath.multiplication.R
 
 @Composable
 fun CreditsScreen(onHome: () -> Unit) {

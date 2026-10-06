@@ -1,7 +1,7 @@
 package com.mbmath.multiplication.game
 
-import android.util.Log
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mbmath.multiplication.data.GameConfigurationStore
@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.BooleanArray
-import kotlin.booleanArrayOf
 import kotlin.random.Random
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
@@ -49,7 +47,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
                 Log.e("GameViewModel", "Unable to load game configuration", exception)
                 null
             }
-            val configuration = savedConfiguration ?: _state.value.configuration
+            val configuration = (savedConfiguration ?: _state.value.configuration)
+                ?.copy(isPlaying = false)
 
             configuration?.let {
                 currentGameMode = it.gameMode
@@ -80,7 +79,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
 
     fun onPlay() {
         val configuration = _state.value.configuration ?: return
-        val startedConfiguration = configuration.copy(wasLoggedIn = true)
+        val startedConfiguration = configuration.copy(
+            wasLoggedIn = true,
+            isPlaying = true
+        )
         configurationChanged = true
         currentGameMode = configuration.gameMode
         currentGameDifficulty = configuration.difficulty
@@ -115,19 +117,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun submitAnswer(optionIndex: Int) {
-
-
         val currentState = _state.value
-
-       // Log.d("submitAnswer", currentState.questions.toString())
-        Log.d(
-            "submitAnswer",
-            currentState.questions.joinToString {
-                "selectedOptions=${it.selectedOptions.contentToString()}, " +
-                    "responseTimes=${it.responseTimes.contentToString()}"
-            }
-        )
-
         val question = currentState.currentQuestion ?: return
         if (optionIndex in currentState.disabledOptions || currentState.selectedOptionIndex != null) return
 
