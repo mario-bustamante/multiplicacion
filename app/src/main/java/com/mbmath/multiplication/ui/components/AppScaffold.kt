@@ -1,16 +1,21 @@
 package com.mbmath.multiplication.ui.components
 
 import android.annotation.SuppressLint
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -18,7 +23,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,31 +32,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.core.os.LocaleListCompat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.LocaleListCompat
 import com.mbmath.multiplication.R
-import androidx.compose.ui.platform.LocalLocale
-import androidx.compose.ui.tooling.preview.Preview
+import com.mbmath.multiplication.game.GameState
+import com.mbmath.multiplication.game.Screens
+import com.mbmath.multiplication.model.Difficulty
+import com.mbmath.multiplication.model.GameConfiguration
+import com.mbmath.multiplication.model.GameMode
 import com.mbmath.multiplication.ui.screens.HomeScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,10 +63,11 @@ fun AppScaffold(
     verticalScrollEnabled: Boolean = true,
     title: String = "",
     onHome: (() -> Unit)? = null,
-    onCredits: (() -> Unit)? = null,
+    showCredits: (() -> Unit)? = null,
     onPlay: (() -> Unit)? = null,
     onBackPlay: (() -> Unit)? = null,
     showResults: (() -> Unit)? = null,
+    showHelp: (() -> Unit)? = null,
     showLanguageSelector: Boolean = false
 ) {
     var languageMenuExpanded by remember { mutableStateOf(false) }
@@ -133,11 +134,11 @@ fun AppScaffold(
                             }
                         }
                     }
-                    onCredits?.let { onClick ->
+                    showHelp?.let { onClick ->
                         IconButton(onClick = onClick) {
                             Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = stringResource(R.string.credits),
+                                imageVector = Icons.Default.Help,
+                                contentDescription = stringResource(R.string.instructions_title),
                                 tint = Color.LightGray
                             )
                         }
@@ -146,7 +147,7 @@ fun AppScaffold(
                         IconButton(onClick = onClick) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
-                                contentDescription = stringResource(R.string.credits),
+                                contentDescription = stringResource(R.string.results),
                                 tint = Color.LightGray
                             )
                         }
@@ -156,6 +157,15 @@ fun AppScaffold(
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = stringResource(R.string.play),
+                                tint = Color.LightGray
+                            )
+                        }
+                    }
+                    showCredits?.let { onClick ->
+                        IconButton(onClick = onClick) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = stringResource(R.string.credits),
                                 tint = Color.LightGray
                             )
                         }
@@ -192,7 +202,6 @@ fun AppScaffold(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-              //
         ) {
             AssetImage(
                 path = "images/background.png",
@@ -233,7 +242,16 @@ fun AppScaffold(
 @Composable
 fun AppScaffoldPreview() {
     HomeScreen(
-        showInstructions = {},
-        onCredits  = {}
+        state = GameState(
+            screen = Screens.Play,
+            configuration = GameConfiguration(
+                player = "Ana",
+                gameMode = GameMode.FIND_RESULT,
+                difficulty = Difficulty.ADVANCED
+            )
+        ),
+        showHelp = {},
+        showCredits  = {},
+        onPlay = {}
     )
 }

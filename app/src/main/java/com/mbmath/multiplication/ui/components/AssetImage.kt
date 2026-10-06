@@ -1,19 +1,16 @@
 package com.mbmath.multiplication.ui.components
 
 import android.graphics.BitmapFactory
-import android.graphics.BitmapFactory.decodeStream
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 
 @Composable

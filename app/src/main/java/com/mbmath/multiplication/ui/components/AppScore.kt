@@ -1,34 +1,20 @@
 package com.mbmath.multiplication.ui.components
 
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -78,13 +64,17 @@ fun AppScore(
                     color = if (isCorrect) colorResource(R.color.correct) else colorResource(R.color.incorrect)
                 )
 
-                repeat(question.errors) {
-                    Spacer(Modifier.width(6.dp))
-                    AppIcon(
-                        contentDescription = status,
-                        tint = colorResource(R.color.incorrect),
-                        imageVector = Icons.Default.Close
-                    )
+                for (optionIndex in question.selectedOptions.indices) {
+                    if (question.selectedOptions[optionIndex] &&
+                        optionIndex != question.correctOptionIndex
+                    ) {
+                        Spacer(Modifier.width(6.dp))
+                        AppIcon(
+                            contentDescription = stringResource(R.string.incorrect),
+                            tint = colorResource(R.color.incorrect),
+                            imageVector = Icons.Default.Close
+                        )
+                    }
                 }
 
                 if (isCorrect) {
@@ -109,7 +99,7 @@ fun AppScorePreview() {
             factor1 = intArrayOf(2, 4, 5),
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(6, 8, 10),
-            errors = 1,
+            selectedOptions = booleanArrayOf(true, true, false),
             correctOptionIndex = 0,
             selectedOption = 1
         ),
@@ -117,7 +107,7 @@ fun AppScorePreview() {
             factor1 = intArrayOf(9, 4, 5),
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(27, 8, 10),
-            errors = 2,
+            selectedOptions = booleanArrayOf(false, true, true),
             correctOptionIndex = 0,
             selectedOption = 2
         )

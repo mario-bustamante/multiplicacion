@@ -21,7 +21,7 @@ class GameViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
             val viewModel = GameViewModel()
-            viewModel.showInstructions(
+            viewModel.showHelp(
                 GameConfiguration("Ana", GameMode.MIXED, Difficulty.EASY)
             )
             viewModel.onPlay()
@@ -53,9 +53,9 @@ class GameViewModelTest {
     }
 
     @Test
-    fun incorrectAnswersDisableOptionsAndIncrementErrorCount(): Unit = runTest {
+    fun incorrectAnswersDisableOptionsAndTrackSelectedOptions(): Unit = runTest {
         val viewModel = GameViewModel()
-        viewModel.showInstructions(
+        viewModel.showHelp(
             GameConfiguration("Ana", GameMode.FIND_RESULT, Difficulty.EASY)
         )
         viewModel.onPlay()
@@ -65,10 +65,16 @@ class GameViewModelTest {
         viewModel.submitAnswer(firstIncorrectIndex)
 
         assertEquals(setOf(firstIncorrectIndex), viewModel.state.value.disabledOptions)
-        assertEquals(1, requireNotNull(viewModel.state.value.currentQuestion).errors)
+        assertEquals(
+            true,
+            requireNotNull(viewModel.state.value.currentQuestion).selectedOptions[firstIncorrectIndex]
+        )
 
         viewModel.submitAnswer(firstIncorrectIndex)
-        assertEquals(1, requireNotNull(viewModel.state.value.currentQuestion).errors)
+        assertEquals(
+            true,
+            requireNotNull(viewModel.state.value.currentQuestion).selectedOptions[firstIncorrectIndex]
+        )
 
         val secondIncorrectIndex = (question.correctOptionIndex + 2) % 3
         viewModel.submitAnswer(secondIncorrectIndex)
@@ -77,7 +83,14 @@ class GameViewModelTest {
             setOf(firstIncorrectIndex, secondIncorrectIndex),
             viewModel.state.value.disabledOptions
         )
-        assertEquals(2, requireNotNull(viewModel.state.value.currentQuestion).errors)
+        val expectedSelectedOptions = booleanArrayOf(false, false, false).apply {
+            this[firstIncorrectIndex] = true
+            this[secondIncorrectIndex] = true
+        }
+        assertEquals(
+            expectedSelectedOptions.toList(),
+            requireNotNull(viewModel.state.value.currentQuestion).selectedOptions.toList()
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -86,7 +99,7 @@ class GameViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
         try {
             val viewModel = GameViewModel()
-            viewModel.showInstructions(
+            viewModel.showHelp(
                 GameConfiguration("Ana", GameMode.FIND_RESULT, Difficulty.EASY)
             )
             viewModel.onPlay()

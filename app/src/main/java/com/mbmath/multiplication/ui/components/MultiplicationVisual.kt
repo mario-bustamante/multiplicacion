@@ -4,15 +4,15 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,10 +22,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mbmath.multiplication.R
+import com.mbmath.multiplication.game.GameState
+import com.mbmath.multiplication.game.Screens
+import com.mbmath.multiplication.model.Difficulty
+import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
+import com.mbmath.multiplication.model.Question
+import com.mbmath.multiplication.ui.screens.PlayScreen
 
 private const val CARD_ASPECT_RATIO = 755f / 1060f
 private val TYPE_A_ROW_COLORS = listOf(
@@ -86,7 +93,7 @@ fun MultiplicationVisual(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 //.padding(4.dp)
-                .padding(start = 10.dp, top=4.dp)
+                .padding(start = 7.dp, top=3.dp)
         )
 
         Column(
@@ -123,7 +130,50 @@ fun MultiplicationVisual(
             fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(end = 10.dp, bottom = 5.dp)
+                .padding(end = 7.dp, bottom = 3.dp)
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PlayScreenPreview() {
+    PlayScreen(
+        state = GameState(
+            screen = Screens.Play,
+            configuration = GameConfiguration(
+                player = "Ana",
+                gameMode = GameMode.FIND_RESULT,
+                difficulty = Difficulty.EASY
+            ),
+            questions = listOf(
+                Question(
+                    factor1 = intArrayOf(9, 1, 9),
+                    factor2 = intArrayOf(9, 1, 9),
+                    results = intArrayOf(81, 2, 81),
+                    correctOptionIndex = 0,
+                    selectedOption = 0
+                ),
+                Question(
+                    factor1 = intArrayOf(2, 2, 5),
+                    factor2 = intArrayOf(3, 2, 2),
+                    results = intArrayOf(6, 4, 10),
+                    correctOptionIndex = 1,
+                    selectedOption = 1
+                ),
+                Question(
+                    factor1 = intArrayOf(2, 3, 5),
+                    factor2 = intArrayOf(3, 3, 2),
+                    results = intArrayOf(6, 9, 10),
+                    correctOptionIndex = 0,
+                    selectedOption = 0
+                ),
+            ),
+        ),
+        submitAnswer = {},
+        showResults = {},
+        showHelp = {},
+        onHome = {}
+    )
 }
