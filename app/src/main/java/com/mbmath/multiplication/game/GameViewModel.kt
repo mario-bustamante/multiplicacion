@@ -1,8 +1,10 @@
 package com.mbmath.multiplication.game
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.mbmath.multiplication.data.GameConfigurationStore
 import com.mbmath.multiplication.model.Difficulty
 import com.mbmath.multiplication.model.GameConfiguration
 import com.mbmath.multiplication.model.GameMode
@@ -12,53 +14,84 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.BooleanArray
+import kotlin.booleanArrayOf
 import kotlin.random.Random
 
-class GameViewModel : ViewModel() {
+class GameViewModel(application: Application) : AndroidViewModel(application) {
+    private val configurationStore = GameConfigurationStore(application)
     private val _state = MutableStateFlow(GameState())
     val state: StateFlow<GameState> = _state.asStateFlow()
 
+    private var configurationChanged = false
     private var currentGameMode = GameMode.FIND_RESULT
     private var currentGameDifficulty = Difficulty.EASY
+    private var questionStartedAtNanos: Long? = null
+
+    init {
+        viewModelScope.launch {
+            val configuration = configurationStore.load()
+            if (!configurationChanged) {
+                _state.value = _state.value.copy(configuration = configuration)
+            }
+        }
+    }
 
     fun showCredits() {
         _state.value = _state.value.copy(screen = Screens.Credits)
     }
 
     fun onHome() {
-        _state.value.configuration?.let { configuration ->
-            currentGameMode = configuration.gameMode
-            currentGameDifficulty = configuration.difficulty
-        }
+        viewModelScope.launch {
+            val savedConfiguration = try {
+                configurationStore.load()
+            } catch (exception: java.io.IOException) {
+                Log.e("GameViewModel", "Unable to load game configuration", exception)
+                null
+            }
+            val configuration = savedConfiguration ?: _state.value.configuration
 
-        _state.value = _state.value.copy(
-            screen = Screens.Home,
-        )
+            configuration?.let {
+                currentGameMode = it.gameMode
+                currentGameDifficulty = it.difficulty
+            }
+
+            _state.value = _state.value.copy(
+                screen = Screens.Home,
+                configuration = configuration
+            )
+        }
     }
 
     fun updateConfiguration(configuration: GameConfiguration) {
+        configurationChanged = true
         _state.value = _state.value.copy(configuration = configuration)
+        persistConfiguration(configuration)
     }
 
     fun showHelp(configuration: GameConfiguration) {
+        configurationChanged = true
         _state.value = _state.value.copy(
             screen = Screens.Help(configuration),
             configuration = configuration
         )
+        persistConfiguration(configuration)
     }
 
     fun onPlay() {
         val configuration = _state.value.configuration ?: return
-        
-        configuration.wasLoggedIn = true
+        val startedConfiguration = configuration.copy(wasLoggedIn = true)
+        configurationChanged = true
         currentGameMode = configuration.gameMode
         currentGameDifficulty = configuration.difficulty
 
         val question = createQuestion(1)
         val questionMode = createQuestionMode()
+        questionStartedAtNanos = System.nanoTime()
 
         _state.value = _state.value.copy(
             screen = Screens.Play,
+            configuration = startedConfiguration,
             currentQuestionMode = questionMode,
             questions = listOf(question),
             questionIndex = 0,
@@ -68,21 +101,49 @@ class GameViewModel : ViewModel() {
             selectedOptionIndex = null,
             disabledOptions = emptySet()
         )
+        persistConfiguration(startedConfiguration)
+    }
+
+    private fun persistConfiguration(configuration: GameConfiguration) {
+        viewModelScope.launch {
+            try {
+                configurationStore.save(configuration)
+            } catch (exception: java.io.IOException) {
+                Log.e("GameViewModel", "Unable to save game configuration", exception)
+            }
+        }
     }
 
     fun submitAnswer(optionIndex: Int) {
+
+
         val currentState = _state.value
+
+       // Log.d("submitAnswer", currentState.questions.toString())
+        Log.d(
+            "submitAnswer",
+            currentState.questions.joinToString {
+                "selectedOptions=${it.selectedOptions.contentToString()}, " +
+                    "responseTimes=${it.responseTimes.contentToString()}"
+            }
+        )
+
         val question = currentState.currentQuestion ?: return
         if (optionIndex in currentState.disabledOptions || currentState.selectedOptionIndex != null) return
 
         val isCorrect = optionIndex == question.correctOptionIndex
         val updatedQuestions = currentState.questions.toMutableList()
-        val updatedQuestion = question.selectOption(optionIndex)
+        val elapsedSeconds = questionStartedAtNanos?.let {
+            (System.nanoTime() - it) / 1_000_000_000f
+        } ?: 0f
+        val responseTimes = question.responseTimes.copyOf()
+        responseTimes[optionIndex] = elapsedSeconds
+        val updatedQuestion = question.selectOption(optionIndex).copy(
+            responseTimes = responseTimes
+        )
 
         if (!isCorrect) {
-            updatedQuestions[currentState.questionIndex] = updatedQuestion.copy(
-                errors = question.errors + 1
-            )
+            updatedQuestions[currentState.questionIndex] = updatedQuestion
             _state.value = currentState.copy(
                 questions = updatedQuestions,
                 feedback = GameFeedback.Incorrect,
@@ -91,6 +152,7 @@ class GameViewModel : ViewModel() {
             return
         }
 
+        questionStartedAtNanos = null
         updatedQuestions[currentState.questionIndex] = updatedQuestion
         val result = question.results[question.correctOptionIndex]
         _state.value = currentState.copy(
@@ -134,6 +196,7 @@ class GameViewModel : ViewModel() {
             nextQuestion = createQuestion(nextStage)
         } while (currentState.questions.any { hasSameFactorPairs(it, nextQuestion) })
         val nextQuestionMode = createQuestionMode()
+        questionStartedAtNanos = System.nanoTime()
 
 
         _state.value = currentState.copy(

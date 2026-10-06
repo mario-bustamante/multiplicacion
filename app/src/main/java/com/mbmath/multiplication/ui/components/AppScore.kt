@@ -78,13 +78,17 @@ fun AppScore(
                     color = if (isCorrect) colorResource(R.color.correct) else colorResource(R.color.incorrect)
                 )
 
-                repeat(question.errors) {
-                    Spacer(Modifier.width(6.dp))
-                    AppIcon(
-                        contentDescription = status,
-                        tint = colorResource(R.color.incorrect),
-                        imageVector = Icons.Default.Close
-                    )
+                for (optionIndex in question.selectedOptions.indices) {
+                    if (question.selectedOptions[optionIndex] &&
+                        optionIndex != question.correctOptionIndex
+                    ) {
+                        Spacer(Modifier.width(6.dp))
+                        AppIcon(
+                            contentDescription = stringResource(R.string.incorrect),
+                            tint = colorResource(R.color.incorrect),
+                            imageVector = Icons.Default.Close
+                        )
+                    }
                 }
 
                 if (isCorrect) {
@@ -109,7 +113,7 @@ fun AppScorePreview() {
             factor1 = intArrayOf(2, 4, 5),
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(6, 8, 10),
-            errors = 1,
+            selectedOptions = booleanArrayOf(true, true, false),
             correctOptionIndex = 0,
             selectedOption = 1
         ),
@@ -117,7 +121,7 @@ fun AppScorePreview() {
             factor1 = intArrayOf(9, 4, 5),
             factor2 = intArrayOf(3, 2, 2),
             results = intArrayOf(27, 8, 10),
-            errors = 2,
+            selectedOptions = booleanArrayOf(false, true, true),
             correctOptionIndex = 0,
             selectedOption = 2
         )

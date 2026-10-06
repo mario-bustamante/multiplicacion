@@ -98,7 +98,11 @@ fun PlayScreen(
     var visibleFeedback by remember { mutableStateOf<GameFeedback?>(null) }
     var feedbackEvent by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(state.feedback, state.currentQuestion?.errors, state.questionIndex) {
+    LaunchedEffect(
+        state.feedback,
+        state.currentQuestion?.selectedOptions?.toList(),
+        state.questionIndex
+    ) {
         state.feedback?.let { feedback ->
             visibleFeedback = feedback
             feedbackEvent++
